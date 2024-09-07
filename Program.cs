@@ -710,6 +710,7 @@ using System;
 using System.Text.RegularExpressions;
 using System.Text;
 using System.Diagnostics.Metrics;
+using System.Security.Cryptography.X509Certificates;
 /*Задание 18: Числовая пирамида
 Разработать программу, которая выводит числовую пирамиду на экран*/
 
@@ -968,9 +969,11 @@ class Program
 //    }
 //}
 
-/*Задание 24: Чек на покупки
-Написать программу, которая принимает список покупок и их стоимость, а затем
-выводит чек с общей суммой и НДС*/
+
+/*Задание 25: Анализ текста
+Разработать приложение, которое анализирует текст, введенный
+пользователем, и выводит статистику по частоте использования каждого слова*/
+
 
 /*class WordCounter
 {
@@ -1018,3 +1021,514 @@ class Program
     }
 }*/
 
+/*Задание 26: Калькулятор времени
+Создать программу, которая складывает или вычитает часы и минуты,
+введенные пользователем*/
+
+/*public class TimeCalculator
+{
+    private int hours { get; set; }
+    private int minutes { get; set; }
+    private int seconds { get; set; }
+
+    public int resultTime;
+
+    public TimeCalculator()
+    {
+        hours = 0; minutes = 0; seconds = 0; resultTime = 0;
+
+        GetHours();
+        GetMinutes();
+        GetSeconds();
+
+        BringingTime();
+    }
+
+    public void GetHours()
+    {
+        Console.WriteLine("Введите количество часов: ");
+
+        hours = int.Parse(Console.ReadLine());
+    }
+
+    public void GetMinutes()
+    {
+        Console.WriteLine("Введите количество минут: ");
+
+        minutes = int.Parse(Console.ReadLine());
+    }
+
+    public void GetSeconds()
+    {
+        Console.WriteLine("Введите количество секунд: ");
+
+        seconds = int.Parse(Console.ReadLine());
+    }
+
+    private void BringingTime()
+    {
+        resultTime = seconds + minutes * 60 + hours * 3600;
+    }
+
+    private int ChoosingAction()
+    {
+        Console.WriteLine("Введите действие:\n1 - сложение времени\n2 - вычитание времени");
+
+        int choice = int.Parse(Console.ReadLine());
+
+        if (choice == 1) return 1;
+
+        else if (choice == 2) return 2;
+
+        else return 0;
+    }
+
+    public int TimeCalculate(int time1, int time2)
+    {
+        int choice = ChoosingAction();
+
+        int result = 0;
+
+        try
+        {
+            if (choice == 1) result = time1 + time2;
+
+            else if (choice == 2) result = time1 - time2;
+        }
+
+        catch (Exception e)
+        {
+            Console.WriteLine($"Ошибка вычисления: {e.Message}");
+        }
+
+        return result;
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        Console.WriteLine("Введите первое время. ");
+
+        TimeCalculator timeCalculator = new TimeCalculator();
+        Console.Clear();
+
+        Console.WriteLine("Введите второе время.");
+
+        TimeCalculator timeCalculator1 = new TimeCalculator();
+        Console.Clear();
+
+        int resultTime = timeCalculator.TimeCalculate(timeCalculator.resultTime, timeCalculator1.resultTime);
+
+        int hours = resultTime / 3600;
+        int minutes = (resultTime % 3600) / 60;
+        int seconds = resultTime % 60;
+
+        Console.WriteLine($"Итого: {hours} часов, {minutes} минут, {seconds} секунд");
+    }
+}*/
+
+/*Задание 27: Нахождение корней уравнения
+Написать программу, которая находит корни квадратного уравнения*/
+
+/*public class EquationCalculator
+{
+    private double a {  get; set; }
+    private double b {  get; set; }
+    private double c {  get; set; }
+
+    private double d;
+
+    public EquationCalculator()
+    {
+        a = 0;
+        b = 0;
+        c = 0;
+
+        GetCoefficients();
+        CalculateDiscriminant();
+    }
+
+    private void GetCoefficients()
+    {
+        Console.WriteLine("Введите коэффициент a:");
+        a = double.Parse(Console.ReadLine());
+
+        Console.WriteLine("Введите коэффициент b: ");
+        b = double.Parse(Console.ReadLine());
+
+        Console.WriteLine("Введите коэффициент с: ");
+        c = double.Parse(Console.ReadLine());
+    }
+
+    private void CalculateDiscriminant()
+    {
+        d = b * b - 4 * a * c;
+    }
+
+    public double[] CalculateRoots()
+    {
+        double[] roots;
+
+        if (d ==  0)
+        {
+            roots = new double[1];
+
+            double x = -b / (2 * a);
+
+            roots[0] = x;
+        }
+
+        else if (d > 0)
+        {
+            roots = new double[2];
+
+            double x1 = (-b + Math.Sqrt(d)) / (2 * a);
+
+            double x2 = (-b - Math.Sqrt(d)) / (2 * a);
+
+            roots[0] = x1;
+            roots[1] = x2;
+        }
+
+        else
+        {
+            throw new InvalidOperationException("Уравнение не имеет действительных корней.");
+        }
+
+        return roots;
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        EquationCalculator equationCalculator = new EquationCalculator();
+
+        double[] result = equationCalculator.CalculateRoots();
+
+        if (result.Length == 2) Console.WriteLine($"Уравнение имеет два корня.\nx1 = {result[0]}\nx2 = {result[1]}");
+
+        else if (result.Length == 1) Console.WriteLine($"Уравнение имеет один корень.\nx = {result[0]}");
+    }
+}*/
+
+/*Задание 28: Система уравнений
+Разработать программу, которая решает систему линейных уравнений с двумя
+переменными*/
+
+/*public class LinearEquationSystem
+{
+    private double a {  get; set; }
+    private double b { get; set; }
+    private double c { get; set; }
+    private double d { get; set; }
+    private double e { get; set; }
+    private double f { get; set; }
+
+    public LinearEquationSystem()
+    {
+        a = 0; b = 0; c = 0; d = 0; e = 0; f = 0;
+
+        GetCoefficients();
+    }
+
+    public (double, double) SolveSystem()
+    {
+        double det = a * d - b * c;
+
+        if (det == 0)
+
+        { 
+            throw new InvalidOperationException("Система уравнений не имеет решения.");
+        }
+
+        double x = (e * d - b * f) / det;
+
+        double y = (a * f - e * c) / det;
+
+        return (x, y);
+    }
+
+    private void GetCoefficients()
+    {
+        Console.WriteLine("Введите коэффициент а: ");
+        a = double.Parse(Console.ReadLine());
+
+        Console.WriteLine("Введите коэффициент b: ");
+        b = double.Parse(Console.ReadLine());
+
+        Console.WriteLine("Введите коэффициент c: ");
+        c = double.Parse(Console.ReadLine());
+
+        Console.WriteLine("Введите коэффициент а1: ");
+        d = double.Parse(Console.ReadLine());
+
+        Console.WriteLine("Введите коэффициент b1: ");
+        e = double.Parse(Console.ReadLine());
+
+        Console.WriteLine("Введите коэффициент c1: ");
+        f = double.Parse(Console.ReadLine());
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        LinearEquationSystem linearEquationSystem = new LinearEquationSystem();
+
+        (double x, double y) = linearEquationSystem.SolveSystem();
+
+        if (x != 0 && y != 0) Console.WriteLine($"Решение системы:\nx = {x}\ny = {y}");
+    }
+}*/
+/*
+Задание 29: Дисковый мониторинг
+Создать приложение, которое выводит информацию о доступных на компьютере
+дисках (размер, свободное место и т.д.)*/
+
+/*class Program
+{
+    static void Main(string[] args)
+    {
+        Console.WriteLine("Информация по дискам: \n");
+
+        DriveInfo[] driveInfos = DriveInfo.GetDrives();
+
+        foreach (DriveInfo d in driveInfos)
+        {
+            Console.WriteLine($"Информация по диску: {d.Name}");
+            Console.WriteLine("Тип диска: {0}", d.DriveType);
+
+            if (d.IsReady == true)
+            {
+                Console.WriteLine("  Том: {0,15}", d.VolumeLabel);
+                Console.WriteLine("  Файловая система: {0,15}", d.DriveFormat);
+                Console.WriteLine("  Доступное пространство для текущего пользователя: {0,15} bytes", d.AvailableFreeSpace);
+                Console.WriteLine("  Общее количество свободного пространства:          {0,15} bytes", d.TotalFreeSpace);
+                Console.WriteLine("  Общий размер диска:            {0,15} bytes", d.TotalSize);
+
+                Console.WriteLine();
+            }
+        }
+    }
+}*/
+
+/*Задание 30: Файловый менеджер
+Написать консольное приложение, которое позволяет выполнять операции с
+файлами (создание, удаление, копирование, перемещение).*/
+
+public class FileOperator
+{
+    private string _path;
+    public FileOperator()
+    {
+        _path = AppDomain.CurrentDomain.BaseDirectory;
+        Choice();
+    }
+
+    private void Choice()
+    {
+        bool exitProgram = false;
+
+        while(!exitProgram)
+        {
+            Console.WriteLine("Введите действие:\n1 - Создать файл\n2 - Переместить файл\n3 - удалить файл\n4 - Скопировать файл\n5 - выход");
+
+            if (int.TryParse(Console.ReadLine(), out int choice))
+            {
+                switch (choice)
+                {
+                    case 1:
+                        Console.WriteLine("Введите название файла с расширением (\"log.txt\")");
+
+                        string fileName = Console.ReadLine();
+                        Console.Clear();
+
+                        if (string.IsNullOrEmpty(fileName))
+                        {
+                            Console.WriteLine("Имя файла не может быть пустым.");
+                            break;
+                        }
+
+                        string filePath = Path.Combine(_path, fileName);
+
+                        if (File.Exists(filePath))
+                        {
+                            Console.WriteLine("Файл с таким названием уже существует.");
+                            break;
+                        }
+
+                        try
+                        {
+                            File.Create(filePath);
+                            Console.WriteLine("Файл создан.");
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine($"Ошибка создания файла: {e.Message}");
+                        }
+                        break;
+
+                    case 2:
+                        if (string.IsNullOrEmpty(_path))
+                        {
+                            Console.WriteLine("Каталог не установлен.");
+                            break;
+                        }
+
+                        Console.WriteLine("Введите имя файла для перемещения: ");
+
+                        string sourceFileName = Console.ReadLine();
+                        Console.Clear();
+
+                        if (string.IsNullOrEmpty(sourceFileName))
+                        {
+                            Console.WriteLine("Имя файла не может быть пустым.");
+                            break;
+                        }
+
+                        filePath = Path.Combine(_path, sourceFileName);
+
+                        if (!File.Exists(filePath))
+                        {
+                            Console.WriteLine("Файл с таким именем не найден.");
+                            break;
+                        }
+                        Console.WriteLine("Введите новый путь для файла: ");
+
+                        string destFileName = Console.ReadLine();
+                        Console.Clear();
+
+                        if (string.IsNullOrEmpty(destFileName))
+                        {
+                            Console.WriteLine("Путь не может быть пустым.");
+                            break;
+                        }
+
+                        else if (!File.Exists(destFileName))
+                        {
+                            Console.WriteLine("Каталог не найден.");
+                            break;
+                        }
+
+                        try
+                        {
+                            File.Move(sourceFileName, destFileName);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Ошибка перемещения: " + ex.Message);
+                        }
+                        break;
+
+                    case 3:
+                        if (string.IsNullOrEmpty(_path))
+                        {
+                            Console.WriteLine("Каталог не установлен.");
+                            break;
+                        }
+
+                        Console.WriteLine("Введите имя файла для удаления: ");
+
+                        fileName = Console.ReadLine();
+                        Console.Clear();
+
+                        if (string.IsNullOrEmpty(fileName))
+                        {
+                            Console.WriteLine("Имя файла не может быть пустым.");
+                            break;
+                        }
+
+                        filePath = Path.Combine(_path, fileName);
+
+                        if (!File.Exists(filePath))
+                        {
+                            Console.WriteLine("Файл не найден.");
+                            break;
+                        }
+
+                        try
+                        {
+                            File.Delete(filePath);
+                            Console.WriteLine("Файл успешно удален.");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Ошибка удаления: " + ex.Message);
+                        }
+                        break;
+                    case 4:
+                        if (string.IsNullOrEmpty(_path))
+                        {
+                            Console.WriteLine("Каталог не установлен.");
+                            break;
+                        }
+
+                        Console.WriteLine("Введите имя файла для копирования: ");
+
+                        fileName = Console.ReadLine();
+                        Console.Clear();
+
+                        if (string.IsNullOrEmpty(fileName))
+                        {
+                            Console.WriteLine("Имя файла не может быть пустым.");
+                            break;
+                        }
+
+                        filePath = Path.Combine(_path, fileName);
+
+                        if (!File.Exists(filePath))
+                        {
+                            Console.WriteLine("Файл не найден.");
+                            break;
+                        }
+
+                        Console.WriteLine("Введите путь для копирования файла: ");
+                        string destinationPath = Console.ReadLine();
+                        Console.Clear();
+
+                        if (string.IsNullOrEmpty(destinationPath))
+                        {
+                            Console.WriteLine("Путь для копирования не может быть пустым.");
+                            break;
+                        }
+
+                        try
+                        {
+                            File.Copy(filePath, Path.Combine(destinationPath, fileName));
+                            Console.WriteLine("Файл успешно скопирован.");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Ошибка копирования: " + ex.Message);
+                        }
+                        break;
+                    case 5:
+                        Console.WriteLine("Выход из программы.");
+                        exitProgram = true;
+                        break;
+                    default:
+                        Console.WriteLine("Ошибка ввода.");
+                        break;
+                }
+            }
+            else
+            {
+                Console.WriteLine("Ошибка ввода.");
+            }
+        }
+
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        FileOperator fileOperator = new FileOperator();
+    }
+}
