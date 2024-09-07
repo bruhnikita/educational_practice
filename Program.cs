@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 //### Задание 1: Калькулятор
 /*Разработать консольное приложение, которое выполняет базовые
@@ -1321,7 +1322,7 @@ class Program
 Написать консольное приложение, которое позволяет выполнять операции с
 файлами (создание, удаление, копирование, перемещение).*/
 
-public class FileOperator
+/*public class FileOperator
 {
     private string _path;
     public FileOperator()
@@ -1531,4 +1532,44 @@ class Program
     {
         FileOperator fileOperator = new FileOperator();
     }
+}*/
+
+/*Задание 31: Работа с JSON
+Создать программу, которая читает данные из JSON-файла, обрабатывает их и
+выводит на экран в формате таблицы*/
+
+public class JSONHandler
+{
+    public void JSONWrite()
+    {
+        Console.WriteLine("Введите количество записей: ");
+
+        int count = int.Parse(Console.ReadLine());
+
+        string symbols = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*_-=+";
+        Random rand = new Random();
+
+        List<JSONData> jsonDataList = new List<JSONData>();
+
+        for (int i = 0; i < count; i++)
+        {
+            string data = new string(Enumerable.Repeat(symbols, 10).Select(s => s[rand.Next(symbols.Length)]).ToArray());
+            JSONData jsonData = new JSONData { Data = data, Index = i };
+            jsonDataList.Add(jsonData);
+        }
+
+        using (FileStream fs = new FileStream("data.json", FileMode.OpenOrCreate))
+        {
+            using (StreamWriter sw = new StreamWriter(fs))
+            {
+                sw.Write(JsonConvert.SerializeObject(jsonDataList));
+            }
+        }
+    }
+}
+
+public class JSONData
+{
+    public string Data { get; set; }
+    public int Index { get; set; }
 }
