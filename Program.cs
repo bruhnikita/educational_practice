@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using System.Xml.Serialization;
 
 //### Задание 1: Калькулятор
 /*Разработать консольное приложение, которое выполняет базовые
@@ -712,6 +713,7 @@ using System.Text.RegularExpressions;
 using System.Text;
 using System.Diagnostics.Metrics;
 using System.Security.Cryptography.X509Certificates;
+using System.Xml;
 /*Задание 18: Числовая пирамида
 Разработать программу, которая выводит числовую пирамиду на экран*/
 
@@ -1538,7 +1540,7 @@ class Program
 Создать программу, которая читает данные из JSON-файла, обрабатывает их и
 выводит на экран в формате таблицы*/
 
-public class JSONHandler
+/*public class JSONHandler
 {
     public void JSONWrite()
     {
@@ -1549,13 +1551,13 @@ public class JSONHandler
         string symbols = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*_-=+";
         Random rand = new Random();
 
-        List<JSONData> jsonDataList = new List<JSONData>();
+        Dictionary<int, JSONData> jsonDataList = new Dictionary<int, JSONData>();
 
         for (int i = 0; i < count; i++)
         {
             string data = new string(Enumerable.Repeat(symbols, 10).Select(s => s[rand.Next(symbols.Length)]).ToArray());
             JSONData jsonData = new JSONData { Data = data, Index = i };
-            jsonDataList.Add(jsonData);
+            jsonDataList.Add(i, jsonData);
         }
 
         using (FileStream fs = new FileStream("data.json", FileMode.OpenOrCreate))
@@ -1566,10 +1568,445 @@ public class JSONHandler
             }
         }
     }
+
+    public void JSONRead()
+    {
+        Console.WriteLine("JSON DATA ");
+
+        using (StreamReader sr = new StreamReader("data.json"))
+        {
+            string json = sr.ReadToEnd();
+            Dictionary<int, JSONData> jsonDataList = JsonConvert.DeserializeObject<Dictionary<int, JSONData>>(json);
+
+            Console.WriteLine("Index\tData");
+            foreach (var kvp in jsonDataList)
+            {
+                Console.WriteLine($"{kvp.Key}\t{kvp.Value.Data}");
+            }
+        }
+    }
 }
 
 public class JSONData
 {
     public string Data { get; set; }
     public int Index { get; set; }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        JSONHandler handler = new JSONHandler();
+
+        handler.JSONWrite();
+        handler.JSONRead();
+    }
+}*/
+
+/*Задание 32: Работа с XML
+Написать программу, которая читает данные из XML-файла, обрабатывает их и
+выводит на экран в формате таблицы*/
+
+// ОНО НЕ РАБОТАЕТ ЕСЛИ ЧТО Я УЖЕ УСТАЛ ПЕРЕПИСЫВАТЬ ВСЁ ПУСТЬ БУДЕТ ТАК Я НЕ ЗНАЮ ЧЕ С НИМ НЕ ТАК
+
+/*[XmlRoot("Users", Namespace = "http://example.com/users")]
+public class Users
+{
+    [XmlElement("User")]
+    public List<User> userList { get; set; } = new List<User>();
+
+    public void Add(User user)
+    {
+        userList.Add(user);
+    }
+}
+
+[XmlType(Namespace = "http://example.com/users")]
+public class User
+{
+    [XmlElement("Name")]
+    public string name { get; set; }
+    [XmlElement("Email")]
+    public string email { get; set; }
+    [XmlElement("Password")]
+    public string password { get; set; }
+
+    public User(string name, string email, string password)
+    {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+    }
+}
+
+public class XMLRedactor
+{
+    private Users users;
+
+    public XMLRedactor(Users users)
+    {
+        this.users = users;
+    }
+
+    public void WriteData()
+    {
+        try
+        {
+            using (XmlWriter writer = XmlWriter.Create("data.xml"))
+            {
+                XmlRootAttribute root = new XmlRootAttribute("Users");
+                root.Namespace = "http://example.com/users";
+                XmlSerializer serializer = new XmlSerializer(typeof(Users), root);
+                serializer.Serialize(writer, users);
+            }
+            Console.WriteLine("Данные успешно записаны в файл.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Ошибка ввода в файл: " + ex.Message);
+            Console.WriteLine("Подробная информация об ошибке:");
+            Console.WriteLine(ex.StackTrace);
+        }
+    }
+
+    public void ReadData()
+    {
+        try
+        {
+            using (XmlReader reader = XmlReader.Create("data.xml"))
+            {
+                XmlRootAttribute root = new XmlRootAttribute("Users");
+                root.Namespace = "http://example.com/users";
+                XmlSerializer deserializer = new XmlSerializer(typeof(Users), root);
+                Users deserializedUsers = (Users)deserializer.Deserialize(reader);
+
+                Console.WriteLine("Имя\tПочта\tПароль");
+                foreach (User user in deserializedUsers.userList)
+                {
+                    Console.WriteLine($"{user.name}\t{user.email}\t{user.password}");
+                }
+            }
+            Console.WriteLine("Данные успешно прочитаны из файла.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Ошибка чтения из файла: " + ex.Message);
+            Console.WriteLine("Подробная информация об ошибке:");
+            Console.WriteLine(ex.StackTrace);
+        }
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        Console.WriteLine("Введите количество записей в файл: ");
+
+        if (!int.TryParse(Console.ReadLine(), out int count) || count <= 0)
+        {
+            Console.WriteLine("Некорректное количество записей.");
+            return;
+        }
+
+        Users users = new Users();
+
+        for (int i = 0;  i < count; i++) 
+        {
+            Console.WriteLine("Введите имя пользователя: ");
+            string name = Console.ReadLine();
+
+            Console.WriteLine("Введите почту пользователя: ");
+            string mail = Console.ReadLine();
+
+            Console.WriteLine("Введите пароль пользователя: ");
+            string password = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(mail) || string.IsNullOrWhiteSpace(password))
+            {
+                Console.WriteLine("Некорректные данные пользователя.");
+                continue;
+            }
+
+            User user = new User(name, mail, password);
+            users.Add(user);
+        }
+
+        if (users.userList.Count == 0)
+        {
+            Console.WriteLine("Нет данных для записи в файл.");
+            return;
+        }
+
+        XMLRedactor redactor = new XMLRedactor(users);
+        redactor.WriteData();
+        redactor.ReadData();
+    }
+}*/
+
+/*Задание 33: Ведение списка дел
+Разработать приложение для ведения списка дел. Пользователь может
+добавлять, удалять и отмечать задачи как выполненные*/
+
+/*public class TodoItem
+{
+    public string Description { get; set; }
+    public bool IsCompleted { get; set; }
+
+    public TodoItem(string description, bool IsCompleted)
+    {
+        Description = description;
+        IsCompleted = false;
+    }
+}*/
+
+/*class Program
+{
+    static void Main(string[] args)
+    {
+        List<TodoItem> todoList = new List<TodoItem>();
+
+        bool isExit = false;
+
+        while (!isExit)
+        {
+
+            Console.WriteLine("1. Добавить задачу\n2. Удалить задачу\n3. Вывести список задач\n4. Отметить как выполненное\n5. Выход");
+
+            int option = int.Parse(Console.ReadLine());
+
+            if (option <= 0 || option > 5)
+            {
+                Console.WriteLine("Ошибка ввода.");
+                isExit = true;
+            }
+
+            switch(option)
+            {
+                case 1:
+                    AddTask(todoList);
+                    break;
+
+                case 2:
+                    DeleteTask(todoList);
+                    break;
+
+                case 3:
+                    PrintTodoList(todoList);
+                    break;
+
+                case 4:
+                    MarkAsCompleted(todoList);
+                    break;
+
+                case 5:
+                    Console.WriteLine("Выход...");
+                    isExit = true;
+                    break;
+            }
+        }
+    }
+
+    static void AddTask(List<TodoItem> todoList)
+    {
+        Console.WriteLine("Введите описание задачи: ");
+        string desc = Console.ReadLine();
+
+        if (string.IsNullOrEmpty(desc))
+        {
+            Console.WriteLine("Описание не может быть пустым.");
+            return;
+        }
+
+        TodoItem task = new TodoItem(desc, false);
+        todoList.Add(task);
+    }
+
+    static void DeleteTask(List<TodoItem> todoList)
+    {
+        Console.WriteLine("Введите порядковый номер задачи для удаления: ");
+        int num = int.Parse(Console.ReadLine()) - 1;
+
+        if (num >= 0 && num < todoList.Count) 
+        {
+            todoList.RemoveAt(num);
+            Console.WriteLine("Задача успешно удалена.");
+        }
+
+        else
+        {
+            Console.WriteLine("Неверный ввод. Повторите снова.");
+            return;
+        }
+    }
+
+    static void PrintTodoList(List<TodoItem> todoList)
+    {
+        for (int i = 0; i < todoList.Count; i++)
+        {
+            Console.WriteLine($"{i + 1}.\t{todoList[i].Description} : {(todoList[i].IsCompleted ? "ВЫПОЛНЕНА" : "ЖДЕТ ВЫПОЛНЕНИЯ")}");
+        }
+    }
+
+    static void MarkAsCompleted(List<TodoItem> todoList)
+    {
+        Console.WriteLine("Введите порядковый номер задачи для отметки: ");
+        int num = int.Parse(Console.ReadLine()) - 1;
+
+        if (num >= 0 && num < todoList.Count)
+        {
+            todoList[num].IsCompleted = true;
+            Console.WriteLine("Задача отмечена выполненной.");
+        }
+
+        else
+        {
+            Console.WriteLine("Невалидный ввод.");
+            return;
+        }
+    }
+}*/
+
+/*Задание 34: Работа с файлами
+Создать программу, которая читает текст из файла и записывает его в другой
+файл с изменением регистра букв (все строчные заменить на прописные и
+наоборот)*/
+
+/*public class RegisterRedactor
+{
+    public string replacementString { get; set; }
+
+    public RegisterRedactor()
+    {
+        GetString();
+    }
+
+    private void GetString()
+    {
+        Console.WriteLine("Введите строку для замены регистров: ");
+
+        replacementString = Console.ReadLine();
+
+        ReplaceChars();
+    }
+
+    private void ReplaceChars()
+    {
+        char[] chars = replacementString.ToCharArray();
+        List<string> newChars = new List<string>();
+
+        foreach (var c in chars)
+        {
+            string tmp;
+            if (char.IsUpper(c))
+            {
+                tmp = char.ToLower(c).ToString();
+                newChars.Add(tmp);
+            }
+
+            else
+            {
+                tmp = char.ToUpper(c).ToString();
+                newChars.Add(tmp);
+            }
+        }
+
+        Console.WriteLine("Результат: ");
+        foreach (var c in newChars)
+        {
+            Console.Write(c);
+        }
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        RegisterRedactor redact = new RegisterRedactor();
+    }
+}*/
+
+/*Задание 35: Календарь
+Написать программу, которая выводит календарь на текущий месяц и позволяет
+пользователю вводить заметки на каждый день.*/
+
+public class Calendar
+{
+    private System.DateTime now = DateTime.Now;
+
+    private int daysInMonth { get; set; }
+
+    private Dictionary<int, string> tasks = new Dictionary<int, string>();
+
+    public Calendar()
+    {
+        daysInMonth = DateTime.DaysInMonth(now.Year, now.Month);
+    }
+
+    public void AddTask()
+    {
+        Console.WriteLine("Введите день месяца: ");
+        int day = int.Parse(Console.ReadLine());
+
+        Console.WriteLine("Введите описание задачи: ");
+        string task = Console.ReadLine();
+
+        tasks.Add(day, task);
+    }
+
+    public void GetCalendar()
+    {
+        Console.WriteLine("  Пн\tВт\tСр\tЧт\tПт\tСб\tВс");
+
+        int dayOfWeek = (int)now.DayOfWeek;
+        int day = 1;
+
+        for (int i = 1; i < 6; i++)
+        {
+            for (int j = 0; j < 7; j++)
+            {
+                if (i == 0 && j < dayOfWeek)
+                {
+                    Console.Write("\t");
+                }
+                else if (day <= daysInMonth)
+                {
+                    Console.Write(day + "\t");
+
+                    if (tasks.ContainsKey(day))
+                    {
+                        Console.WriteLine("Задачи:");
+                        foreach (var task in tasks[day])
+                        {
+                            Console.Write("\t" + task);
+                        }
+                    }
+                    else
+                    {
+                        /*Console.WriteLine();*/
+                    }
+
+                    day++;
+                }
+                else
+                {
+                    Console.Write("\t");
+                }
+            }
+            Console.WriteLine();
+        }
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        Calendar calendar = new Calendar();
+
+
+        calendar.GetCalendar();
+    }
 }
