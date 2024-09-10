@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Xml.Serialization;
+using System.Security.Cryptography;
 
 //### Задание 1: Калькулятор
 /*Разработать консольное приложение, которое выполняет базовые
@@ -38,25 +39,30 @@ using System.Xml.Serialization;
 //}
 
 //class Program
-//{
-//    static void Main(string[] args)
-//    {
-//        Calc calc = new Calc();
-//        Console.WriteLine("Введите первое число:");
-//        int a = Convert.ToInt32(Console.ReadLine());
+/*{
+    static void Main(string[] args)
+    {
+        Calc calc = new Calc();
+        Console.WriteLine("Введите первое число:");
+        double a = Convert.ToDouble(Console.ReadLine());
 
-//        Console.WriteLine("Введите второе число:");
-//        int b = Convert.ToInt32(Console.ReadLine());
+        Console.WriteLine("Введите второе число:");
+        double b = Convert.ToDouble(Console.ReadLine());
 
-//        Console.WriteLine("Введите 1 для сложения \n2 - для вычитания\n3 - для деления\n4 - для умножения");
-//        int flag = Convert.ToInt32(Console.ReadLine());
+        Console.WriteLine("Введите 1 для сложения \n2 - для вычитания\n3 - для деления\n4 - для умножения");
+        int flag = Convert.ToInt32(Console.ReadLine());
 
-//        Console.WriteLine("Результат: ");
-
+        Console.WriteLine("Результат: ");
+*/
 //        if (flag == 1) { Console.Write(calc.Plus(a, b)); }
 //        else if (flag == 2) { Console.Write(calc.Minus(a, b)); }
 //        else if (flag == 3) { Console.Write(calc.Del(a, b)); }
 //        else if (flag == 4) { Console.Write(calc.Umn(a, b)); } 
+
+/*else*/
+/*{
+    Console.WriteLine("Ошибка ввода.");
+}*/
 //    }
 //}
 
@@ -94,12 +100,12 @@ using System.Xml.Serialization;
 //    {
 //        int counter = 1;
 
-//        for (int i = 0; i < line.Length; i++) 
+//        for (int i = 0; i < line.Length; i++)
 //        {
 //            if ((line[i] == '.') && (line[i + 1] != '\n'))
 //            {
 //                counter++;
-//            } 
+//            }
 //        }
 
 //        return counter;
@@ -595,9 +601,6 @@ using System.Xml.Serialization;
 //    }
 //}
 
-using System;
-
-using System;
 /*Задание 16: Матрица
 Создать приложение для работы с матрицами: сложение, вычитание, умножение
 матриц, транспонирование матрицы.*/
@@ -708,12 +711,6 @@ using System;
 //    }
 //}
 
-using System;
-using System.Text.RegularExpressions;
-using System.Text;
-using System.Diagnostics.Metrics;
-using System.Security.Cryptography.X509Certificates;
-using System.Xml;
 /*Задание 18: Числовая пирамида
 Разработать программу, которая выводит числовую пирамиду на экран*/
 
@@ -1932,13 +1929,13 @@ class Program
 Написать программу, которая выводит календарь на текущий месяц и позволяет
 пользователю вводить заметки на каждый день.*/
 
-public class Calendar
+/*public class Calendar
 {
     private System.DateTime now = DateTime.Now;
 
     private int daysInMonth { get; set; }
 
-    private Dictionary<int, string> tasks = new Dictionary<int, string>();
+    public static Dictionary<int, Task> tasks = new Dictionary<int, Task>();
 
     public Calendar()
     {
@@ -1953,19 +1950,27 @@ public class Calendar
         Console.WriteLine("Введите описание задачи: ");
         string task = Console.ReadLine();
 
-        tasks.Add(day, task);
+        tasks.Add(day, new Task(task, day));
     }
 
     public void GetCalendar()
     {
         Console.WriteLine("  Пн\tВт\tСр\tЧт\tПт\tСб\tВс");
 
-        int dayOfWeek = (int)now.DayOfWeek;
+        DateTime firstDayOfMonth = new DateTime(now.Year, now.Month, 1);
+        int dayOfWeek = (int)firstDayOfMonth.DayOfWeek;
         int day = 1;
 
-        for (int i = 1; i < 6; i++)
+        if (dayOfWeek == 0)
         {
-            for (int j = 0; j < 7; j++)
+            dayOfWeek = 7;
+        }
+
+        int weeks = (int)Math.Ceiling((double)(daysInMonth + dayOfWeek - 1) / 7);
+
+        for (int i = 0; i < weeks; i++)
+        {
+            for (int j = 1; j < 8; j++)
             {
                 if (i == 0 && j < dayOfWeek)
                 {
@@ -1974,19 +1979,6 @@ public class Calendar
                 else if (day <= daysInMonth)
                 {
                     Console.Write(day + "\t");
-
-                    if (tasks.ContainsKey(day))
-                    {
-                        Console.WriteLine("Задачи:");
-                        foreach (var task in tasks[day])
-                        {
-                            Console.Write("\t" + task);
-                        }
-                    }
-                    else
-                    {
-                        /*Console.WriteLine();*/
-                    }
 
                     day++;
                 }
@@ -1998,7 +1990,51 @@ public class Calendar
             Console.WriteLine();
         }
     }
+
+    public void GetTasksList()
+    {
+        Console.WriteLine("Список задач: ");
+        foreach (var task in tasks)
+        {
+            string status = task.Value.IsCompleted ? "Выполнено" : "Не выполнено";
+            Console.WriteLine($"{task.Key}. {task.Value.Description} - {status}");
+        }
+    }
+    public class Task
+    {
+        public string Description { get; set; }
+        public bool IsCompleted { get; set; }
+        public int Day { get; set; }
+
+        public Task(string description, int day)
+        {
+            description = Description;
+            IsCompleted = false;
+            day = Day;
+        }
+
+        public static void MarkAsCompleted(Task task)
+        {
+            Console.WriteLine("Введите день, на который определена задача: ");
+            int day = int.Parse(Console.ReadLine());
+
+            try
+            {
+                task.IsCompleted = true;
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine("Ошибка выполнения задачи: " + ex.Message);
+            }
+
+
+
+        }
+    }
 }
+
+
 
 class Program
 {
@@ -2006,7 +2042,858 @@ class Program
     {
         Calendar calendar = new Calendar();
 
+        bool isExit = false;
+        while (!isExit)
+        {
+            try
+            {
+                Console.WriteLine("Введите действие:\n1 - Вывести календарь\n2 - создать задачу\n3 - вывести список задач\n4 - пометить задачу выполненной\n5 - выход");
+                int choice = int.Parse(Console.ReadLine());
 
-        calendar.GetCalendar();
+                if (choice <= 0 || choice > 5)
+                {
+                    Console.WriteLine("Ошибка ввода.");
+                    continue;
+                }
+
+                switch (choice)
+                {
+                    case 1:
+                        calendar.GetCalendar();
+                        Console.WriteLine();
+                        break;
+
+                    case 2:
+                        calendar.AddTask();
+                        break;
+
+                    case 3:
+                        calendar.GetTasksList();
+                        break;
+
+                    case 4:
+                        Console.WriteLine("Введите день, на который хотели бы установить задачу: ");
+                        int day = int.Parse(Console.ReadLine());
+
+                        foreach (var task in Calendar.tasks)
+                        {
+                            if (task.Key == day)
+                            {
+                                var completedTask = task.Value;
+                                completedTask.IsCompleted = true;
+                            }
+                        }
+                        break;
+                }
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine("Ошибка: " + e.Message);
+            }
+        }
+    }
+}*/
+
+/*Задание 36: Учёт успеваемости студентов
+Разработать систему учета успеваемости студентов, которая хранит
+информацию о студентах и их оценках по предметам*/
+
+/*public class Student
+{
+    public string Name { get; set; }
+    public string SecondName { get; set; }
+    public Dictionary<string, List<int>> Evaluations { get; set; }
+
+    public Student(string name, string secondName)
+    {
+        Evaluations = new Dictionary<string, List<int>>();
+        Name = name;
+        SecondName = secondName;
+    }
+
+    public void AddRatings()
+    {
+        while (true)
+        {
+            Console.WriteLine("Введите название предмета:\nexit - для выхода");
+            string discipline = Console.ReadLine();
+
+            if (string.IsNullOrEmpty(discipline))
+            {
+                Console.WriteLine("Название дисциплины не может быть пустым. Введите снова: ");
+                continue;
+            }
+
+            else if (discipline == "exit")
+            {
+                break;
+            }
+
+            List<int> ratings = new List<int>();
+
+            while (true)
+            {
+                Console.WriteLine("Введите оценку. 0 для выхода.");
+                int rating = int.Parse(Console.ReadLine());
+
+                if (rating < 0 || rating > 5)
+                {
+                    Console.WriteLine("Неверная оценка. Оценка не может быть меньше нуля и больше 5. Введите снова.");
+                    continue;
+                }
+
+                else if (rating == 0)
+                {
+                    break;
+                }
+
+                ratings.Add(rating);
+            }
+
+            if (ratings.Count > 0)
+            {
+                Evaluations.Add(discipline, ratings);
+            }
+        }
+    }
+
+    public double GetAverage()
+    {
+        double average = 0;
+
+        int sum = 0;
+        int count = 0;
+
+        foreach (var discipline in Evaluations)
+        {
+            foreach (int rating in discipline.Value)
+            {
+                sum += rating;
+                count++;
+            }
+        }
+
+        if (count > 0)
+        {
+            average = (double)sum / count;
+        }
+
+        return average;
+    }
+}
+
+public class Class
+{
+    public List<Student> Students { get; set; }
+
+    public Class()
+    {
+        Students = new List<Student>();
+    }
+
+    public void AddStudent()
+    {
+        Console.WriteLine("Введите имя студента: ");
+        string name = Console.ReadLine();
+
+        if (string.IsNullOrEmpty(name))
+        {
+            Console.WriteLine("Невалидный ввод. Попробуйте снова.");
+            return;
+        }
+
+        Console.WriteLine("Введите фамилию студента: ");
+        string secondName = Console.ReadLine();
+
+        if (string.IsNullOrEmpty(secondName))
+        {
+            Console.WriteLine("Невалидный ввод. Попробуйте снова.");
+            return;
+        }
+
+        Student student = new Student(name, secondName);
+        Students.Add(student);
+        student.AddRatings();
+    }
+
+    public void PrintStudentsList()
+    {
+        if (Students.Count == 0)
+        {
+            Console.WriteLine("Список студентов пока пуст.");
+            return;
+        }
+
+        foreach (Student student in Students)
+        {
+            Console.WriteLine($"{student.Name} {student.SecondName}:");
+
+            foreach (var rating in student.Evaluations)
+            {
+                Console.WriteLine($"{rating.Key}: {string.Join(", ", rating.Value)}");
+            }
+
+            Console.WriteLine($"\n----------------------------------Средняя оценка по всем предметам: {student.GetAverage():F2}");
+        }
+    }
+
+    public Student GetStudent()
+    {
+        Console.WriteLine("Введите имя студента: ");
+        string name = Console.ReadLine();
+
+        Console.WriteLine("Введите фамилию студента: ");
+        string secondName = Console.ReadLine();
+
+        foreach (Student student in Students)
+        {
+            if (student.Name == name && student.SecondName == secondName)
+            {
+                return student;
+            }
+        }
+
+        return null;
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        Class studentsClass = new Class();
+
+        bool isExit = false;
+
+        while (!isExit)
+        {
+            Console.WriteLine("Введите действие:\n1 - Вывести список всех студентов\n2 - Добавить студента\n3 - Получить среднюю оценку студента\n4 - Выход");
+            int choice = int.Parse(Console.ReadLine());
+
+            if (choice <= 0 || choice > 4)
+            {
+                Console.WriteLine("Ошибка выбора. Введите снова.");
+                continue;
+            }
+
+            try
+            {
+                switch (choice)
+                {
+                    case 1:
+                        studentsClass.PrintStudentsList();
+                        break;
+
+                    case 2:
+                        studentsClass.AddStudent();
+                        break;
+
+                    case 3:
+                        Student specificStudent = studentsClass.GetStudent();
+                        if (specificStudent != null)
+                        {
+                            Console.WriteLine($"Средняя оценка студента {specificStudent.Name} {specificStudent.SecondName}: {specificStudent.GetAverage():F2}");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Студент не найден.");
+                        }
+                        break;
+
+                    case 4:
+                        Console.WriteLine("Выход.");
+                        isExit = true;
+                        break;
+                }
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine("Ошибка: " + ex.Message);
+            }
+        }
+    }
+}*/
+
+/*Задание 37: Книга контактов
+Создать консольное приложение для хранения контактов (имя, телефон, email).
+Реализовать функции добавления, удаления, редактирования и поиска
+контактов*/
+
+
+
+/*public class ContactList
+{
+    public List<Contact> Contacts { get; set;}
+
+    public ContactList()
+    {
+        Contacts = new List<Contact>();
+    }
+
+    public class Contact
+    {
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
+
+        public Contact(string name, string email, string phone)
+        {
+            Name = name;
+            Email = email;
+            Phone = phone;
+        }
+    }
+
+    public void AddContact()
+    {
+        Console.WriteLine("Введите имя: ");
+        string name = Console.ReadLine();
+
+        if (string.IsNullOrEmpty(name))
+        {
+            Console.WriteLine("Имя не может быть пустым. Попробуйте снова.");
+            return;
+        }
+
+        Console.WriteLine("Введите мейл: ");
+        string email = Console.ReadLine();
+
+        if (string.IsNullOrEmpty(email))
+        {
+            Console.WriteLine("Мейл не может быть пустым. Попробуйте снова.");
+            return;
+        }
+
+        Console.WriteLine("Введите номер телефона: ");
+        string phone = Console.ReadLine();
+
+        if (string.IsNullOrEmpty(phone))
+        {
+            Console.WriteLine("Телефон не может быть пустым. Попробуйте снова.");
+            return;
+        }
+
+        try
+        {
+            Contact contact = new Contact(name, email, phone);
+            Contacts.Add(contact);
+        }
+
+        catch (Exception ex) 
+        {
+            Console.WriteLine("Ошибка добавления контакта: " + ex.Message);
+        }
+    }
+
+    public void RemoveContact()
+    {
+        Contact searchContact = GetContact();
+
+        if (searchContact == null)
+        {
+            Console.WriteLine("Контакт не найден. Попробуйте снова.");
+        }
+
+        else
+        {
+            try
+            {
+                Contacts.Remove(searchContact);
+                Console.WriteLine("Контакт удален.");
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine("Ошибка удаления: " + ex.Message);
+            }
+        }
+        
+    }
+
+    public Contact GetContact()
+    {
+        Console.WriteLine("Введите вариант поиска:\n1 - по имени\n2 - по мейлу\n3 - по номеру телефона");
+        int choice = int.Parse(Console.ReadLine());
+
+        if (choice <= 0 || choice > 3)
+        {
+            Console.WriteLine("Ошибка ввода. Попробуйте снова.");
+            return null;
+        }
+
+        Console.WriteLine("Введите значение для поиска:");
+        string searchValue = Console.ReadLine();
+
+        bool isFound = false;
+
+        foreach (Contact contact in Contacts)
+        {
+            switch (choice)
+            {
+                case 1:
+                    if (contact.Name == searchValue)
+                    {
+                        return contact;
+                        isFound = true;
+                    }
+                    break;
+
+                case 2:
+                    if (contact.Email == searchValue)
+                    {
+                        return contact;
+                        isFound = true;
+
+                    }
+                    break;
+
+                case 3:
+                    if (contact.Phone == searchValue)
+                    {
+                        return contact;
+                        isFound = true;
+
+                    }
+                    break;
+            }
+        }
+
+        if (!isFound)
+        {
+            return null;
+        }
+
+        return null;
+    }
+
+    public void ChangeContact()
+    {
+        Contact searchContact = GetContact();
+
+        if (searchContact == null)
+        {
+            Console.WriteLine("Ошибка изменения контакта. Контакт не найден.");
+            return;
+        }
+
+        else
+        {
+            try
+            {
+                bool isExit = false;
+                while(!isExit)
+                {
+                    Console.WriteLine("Введите опцию для изменения:\n1 - номер телефона\n2 - мейл\n3 - имя\n4 - выход");
+                    int choice = int.Parse(Console.ReadLine());
+
+                    if (choice == null || choice <= 0 || choice > 4)
+                    {
+                        Console.WriteLine("Ошибка ввода. Попробуйте снова.");
+                        return;
+                    }
+
+                    switch (choice)
+                    {
+                        case 1:
+                            Console.WriteLine("Введите номер для замены: ");
+                            string changePhone = Console.ReadLine();
+
+                            searchContact.Phone = changePhone;
+                            break;
+
+                        case 2:
+                            Console.WriteLine("Введите мейл для замены: ");
+                            string changeMail = Console.ReadLine();
+
+                            searchContact.Email = changeMail;
+                            break;
+
+                        case 3:
+                            Console.WriteLine("Введите имя для замены:");
+                            string changeName = Console.ReadLine();
+
+                            searchContact.Name = changeName;
+                            break;
+
+                        case 4:
+                            isExit = true;
+                            break;
+                    }
+                }
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine("Ошибка изменения контакта: " + e.Message);
+            }
+        }
+    }
+
+    public void PrintAllContacts()
+    {
+        if (Contacts.Count == 0) 
+        {
+            Console.WriteLine("Список контактов пока пуст.");
+            return;
+        }
+
+        Console.WriteLine("Имя\tМейл\t\tТелефон");
+        foreach (Contact contact in Contacts)
+        {
+            Console.WriteLine($"{contact.Name}\t{contact.Email}\t{contact.Phone}");
+        }
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        ContactList contactList = new ContactList();
+
+        bool isExit = false;
+        while(!isExit)
+        {
+            Console.WriteLine("Введите действие:\n1 - Вывести список контактов\n2 - Добавить контакт\n3 - Изменить контакт\n4 - Удалить контакт\n5 - Найти контакт\n6 - Выйти");
+            int choice = int.Parse(Console.ReadLine());
+
+            if (choice == null || choice <= 0 || choice > 6)
+            {
+                Console.WriteLine("Ошибка ввода. Введите снова");
+                return;
+            }
+
+            try
+            {
+                switch (choice)
+                {
+                    case 1:
+                        contactList.PrintAllContacts();
+                        break;
+
+                    case 2:
+                        contactList.AddContact();
+                        break;
+
+                    case 3:
+                        contactList.ChangeContact();
+                        break;
+
+                    case 4:
+                        contactList.RemoveContact();
+                        break;
+
+                    case 5:
+                        contactList.GetContact();
+                        break;
+
+                    case 6:
+                        isExit = true;
+                        break;
+                }
+            }
+
+            catch (Exception e) 
+            { 
+                Console.WriteLine("Ошибка: " + e.Message); 
+            }
+        }
+    }
+}*/
+
+/*class TicTacToeGame
+{
+    static char[,] board = new char[3, 3];
+    static char currentPlayer = 'X';
+
+    static void InitializateBoard()
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                board[i, j] = ' ';
+            }
+        }
+    }
+
+    static void PrintBoard()
+    {
+        Console.Clear();
+
+        Console.WriteLine(" 1 | 2 | 3");
+
+        Console.WriteLine(" ---------");
+
+        Console.WriteLine(" 4 | 5 | 6");
+
+        Console.WriteLine(" ---------");
+
+        Console.WriteLine(" 7 | 8 | 9\n");
+
+
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                Console.Write(" " + board[i, j] + " |");
+            }
+            Console.WriteLine();
+            Console.WriteLine(" ---------");
+        }
+    }
+
+    static void MakeMove()
+    { 
+        Console.Write("Игрок " + currentPlayer + ", введите движение (1-9): ");
+
+        int move = int.Parse(Console.ReadLine());
+
+        int row = (move - 1) / 3;
+
+        int col = (move - 1) % 3;
+
+        if (board[row, col] != ' ')
+        {
+            Console.WriteLine("Невозможное движение, попробуйте снова.");
+            MakeMove();
+        }
+        else
+        {
+            board[row, col] = currentPlayer;
+        }
+    }
+
+
+    static void CheckWin()
+    {
+        for (int i = 0; i < 3; i++)
+        { 
+            if (board[i, 0] == board[i, 1] && board[i, 1] == board[i, 2] && board[i, 0] != ' ')
+            {
+                Console.WriteLine("Игрок " + board[i, 0] + " победил!");
+                Environment.Exit(0);
+            }
+        }
+
+        for (int i = 0; i < 3; i++)
+
+        {
+            if (board[0, i] == board[1, i] && board[1, i] == board[2, i] && board[0, i] != ' ')
+            {
+                Console.WriteLine("Игрок " + board[0, i] + " победил!");
+                Environment.Exit(0);
+            }
+
+        }
+
+        if ((board[0, 0] == board[1, 1] && board[1, 1] == board[2, 2] && board[0, 0] != ' ') ||
+            (board[0, 2] == board[1, 1] && board[1, 1] == board[2, 0] && board[0, 2] != ' '))
+        {
+            Console.WriteLine("Игрок " + board[1, 1] + " победил!");
+            Environment.Exit(0);
+        }
+
+    }
+
+
+    static void SwitchPlayer()
+    {
+        currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+    }
+
+    static void Main(string[] args)
+    {
+        InitializateBoard();
+
+        while(true)
+        {
+            PrintBoard();
+            MakeMove();
+            CheckWin();
+            SwitchPlayer();
+        }
+    }
+}*/
+
+/*Задание 39: Игра "Быки и коровы"
+Создать игру "Быки и коровы", где игрок должен угадать загаданное
+программой четырехзначное число*/
+
+/*class BullsAndCowsGame
+{
+    private int cows;
+    private int bulls;
+    private int countOfMoves;
+    private int randomNum;
+    private int userNum;
+
+    public BullsAndCowsGame()
+    {
+        cows = 0;
+        bulls = 0;
+        countOfMoves = 0;
+
+        PlayGame();
+    }
+
+    public int Cows { get => cows; }
+    public int Bulls { get => bulls; }
+    public int CountOfMoves { get => countOfMoves; }
+
+    private void GetRandomNum()
+    {
+        Random random = new Random();
+        randomNum = random.Next(1000, 10000);
+    }
+
+    private void CheckCowsAndBulls()
+    {
+        char[] randomChars = randomNum.ToString().ToCharArray();
+        char[] userChars = userNum.ToString().ToCharArray();
+
+        cows = 0;
+        bulls = 0;
+
+        for (int i = 0; i < 4; i++)
+        {
+            if (randomChars[i] == userChars[i])
+            {
+                bulls++;
+            }
+            else if (randomChars.Contains(userChars[i]))
+            {
+                cows++;
+            }
+        }
+    }
+
+    private void GetUserNum()
+    {
+        Console.WriteLine("Введите число: ");
+        int num = 0;
+
+        while (true)
+        {
+            try
+            {
+                num = int.Parse(Console.ReadLine());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Ошибка ввода. Попробуйте снова.");
+                continue;
+            }
+
+            if (num < 1000 || num > 9999)
+            {
+                Console.WriteLine("Ошибка ввода. Число должно быть 4-значным.");
+                continue;
+            }
+
+            userNum = num;
+            break;
+        }
+    }
+
+    private bool CheckWin()
+    {
+        if (bulls == 4)
+        {
+            Console.WriteLine("Поздравляем! Вы угадали число!");
+            return true;
+        }
+
+        countOfMoves++;
+        Console.WriteLine("Коровы: " + cows);
+        Console.WriteLine("Быки: " + bulls);
+        Console.WriteLine("Попыток: " + countOfMoves);
+
+        cows = 0;
+        bulls = 0;
+
+        return false;
+    }
+
+    private void PlayGame()
+    {
+        GetRandomNum();
+
+        while (true)
+        {
+            GetUserNum();
+            CheckCowsAndBulls();
+            if (CheckWin()) break;
+        }
+    }
+
+    static void Main(string[] args)
+    {
+        BullsAndCowsGame game = new BullsAndCowsGame();
+    }
+}*/
+
+
+/*Задание 40: Симуляция банкомата
+Написать программу, которая симулирует работу банкомата: внесение средств,
+снятие средств, просмотр баланса*/
+public class ATMMachine
+{
+    private int BankAccount {  get; set; }
+
+    public ATMMachine(int bankAccount)
+    {
+        BankAccount = 0;
+    }
+
+    public void DepositFunds()
+    {
+        Console.WriteLine("Введите сумму для внесения: ");
+        int count = int.Parse(Console.ReadLine());
+
+        BankAccount += count;
+    }
+
+    public void WithdrawFunds()
+    {
+        Console.WriteLine("Введите сумму для снятия: ");
+        int count = int.Parse(Console.ReadLine());
+
+        BankAccount -= count;
+    }
+
+    public void ViewBalance()
+    {
+        Console.WriteLine(BankAccount);
+    }
+}
+
+public class BankUser
+{
+    private string Nikname;
+    private string Password;
+
+    private Dictionary<string, string> UserData;
+
+    public BankUser(string name, string password)
+    {
+        Nikname = name;
+        Password = password;
+        UserData = new Dictionary<string, string>();
+    }
+
+    public void Registration()
+    {
+        Console.WriteLine("Введите ");
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+
     }
 }
