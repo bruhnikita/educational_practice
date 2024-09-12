@@ -2839,41 +2839,74 @@ class Program
 /*Задание 40: Симуляция банкомата
 Написать программу, которая симулирует работу банкомата: внесение средств,
 снятие средств, просмотр баланса*/
+using System;
+using System.Collections.Generic;
+
 public class ATMMachine
 {
-    private int BankAccount {  get; set; }
+    public List<BankUser> bankUsers { get; set; }
 
-    public ATMMachine(int bankAccount)
+    public ATMMachine()
     {
-        BankAccount = 0;
+        bankUsers = new List<BankUser>();
     }
 
-    public void DepositFunds()
+    public void DepositFunds(BankUser user)
     {
         Console.WriteLine("Введите сумму для внесения: ");
-        int count = int.Parse(Console.ReadLine());
+        int amount;
+        while (!int.TryParse(Console.ReadLine(), out amount) || amount <= 0)
+        {
+            Console.WriteLine("Неверная сумма. Попробуйте снова.");
+        }
 
-        BankAccount += count;
+        user.BankAccount += amount;
     }
 
-    public void WithdrawFunds()
+    public void WithdrawFunds(BankUser user)
     {
         Console.WriteLine("Введите сумму для снятия: ");
-        int count = int.Parse(Console.ReadLine());
+        int amount;
+        while (!int.TryParse(Console.ReadLine(), out amount) || amount <= 0)
+        {
+            Console.WriteLine("Неверная сумма. Попробуйте снова.");
+        }
 
-        BankAccount -= count;
+        if (user.BankAccount < amount)
+        {
+            Console.WriteLine("Недостаточно средств на счете.");
+            return;
+        }
+
+        user.BankAccount -= amount;
     }
 
-    public void ViewBalance()
+    public void ViewBalance(BankUser user)
     {
-        Console.WriteLine(BankAccount);
+        Console.WriteLine($"Ваш баланс: {user.BankAccount}");
+    }
+
+    public void AddUser()
+    {
+        try
+        {
+            bankUsers.Add(BankUser.Registration());
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Ошибка добавления пользователя: " + ex.Message);
+            return;
+        }
     }
 }
 
 public class BankUser
 {
-    private string Nikname;
-    private string Password;
+    public string Nikname { get; set; }
+    private string Password { get; set; }
+    public int BankAccount { get; set; }
+
+    private bool isAuth { get; set; }
 
     private Dictionary<string, string> UserData;
 
@@ -2882,11 +2915,76 @@ public class BankUser
         Nikname = name;
         Password = password;
         UserData = new Dictionary<string, string>();
+        isAuth = false;
+
+        BankAccount = 0;
     }
 
-    public void Registration()
+    public static BankUser Registration()
     {
-        Console.WriteLine("Введите ");
+        Console.WriteLine("Введите имя пользователя: ");
+        string name = Console.ReadLine();
+
+        while (string.IsNullOrEmpty(name))
+        {
+            Console.WriteLine("Поле имени не может быть пустым. Попробуйте снова");
+            name = Console.ReadLine();
+        }
+
+        Console.WriteLine("Введите пароль: ");
+        string password = Console.ReadLine();
+
+        while (string.IsNullOrEmpty(password))
+        {
+            Console.WriteLine("Пароль не может быть пустым. Попробуйте снова.");
+            password = Console.ReadLine();
+        }
+
+        BankUser newUser = new BankUser(name, password);
+
+        return newUser;
+    }
+
+    public void Authorization(List<BankUser> listUsers)
+    {
+        int attempts = 0;
+        while (attempts < 3)
+        {
+            Console.WriteLine("Введите имя пользователя: ");
+            string authName = Console.ReadLine();
+
+            if (string.IsNullOrEmpty(authName))
+            {
+                Console.WriteLine("Имя пользователя не может быть пустым. Введите снова.");
+                attempts++;
+                continue;
+            }
+
+            Console.WriteLine("Введите пароль: ");
+            string authPass = Console.ReadLine();
+
+            if (string.IsNullOrEmpty(authPass))
+            {
+                Console.WriteLine("Пароль не может быть пустым. Попробуйте снова.");
+                attempts++;
+                continue;
+            }
+
+            foreach (BankUser user in listUsers)
+            {
+                if (user.Nikname == authName && user.Password == authPass)
+                {
+                    Console.WriteLine("Авторизация прошла успешно.");
+                    user.isAuth = true;
+                    return;
+                }
+            }
+
+            Console.WriteLine("Неверное имя пользователя или пароль. Попробуйте снова.");
+            attempts++;
+        }
+
+        Console.WriteLine("Превышен лимит попыток. Авторизация не удалась.");
     }
 }
 
@@ -2894,6 +2992,91 @@ class Program
 {
     static void Main(string[] args)
     {
+        ATMMachine bank = new ATMMachine();
 
+        int choice;
+        while (true)
+        {
+            Console.WriteLine("Введите действие:\n1 - Зарегистрировать пользователя\n2 - Авторизоваться\n" +
+                "3 - Внести наличные\n4 - Снять наличные\n5 - Показать абаланс\n6 - Выход");
+
+            try
+            {
+                choice = int.Parse(Console.ReadLine());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Неверный ввод. Попробуйте еще раз.");
+                continue;
+            }
+
+            switch (choice)
+            {
+                case 1:
+                    bank.AddUser();
+                    break;
+                case 2:
+                    BankUser user = new BankUser("", "");
+                    user.Authorization(bank.bankUsers);
+                    break;
+                case 3:
+                    Console.WriteLine("Введите имя пользователя: ");
+                    string depositUserName = Console.ReadLine();
+
+                    BankUser depositUser = bank.bankUsers.Find(u => u.Nikname == depositUserName);
+
+                    if (depositUserName == null)
+                    {
+                        Console.WriteLine("Пользователь не найден.");
+                    }
+
+                    else
+                    {
+                        bank.DepositFunds(depositUser);
+                    }
+                    break;
+
+                case 4:
+                    Console.WriteLine("Введите имя пользователя: ");
+                    string withdrawFundsUser = Console.ReadLine();
+
+                    BankUser withdrawFundUser = bank.bankUsers.Find(u => u.Nikname ==  withdrawFundsUser);
+
+                    if (withdrawFundUser == null)
+                    {
+                        Console.WriteLine("Имя пользователя не может быть пустым.");
+                    }
+
+                    else
+                    {
+                        bank.WithdrawFunds(withdrawFundUser);
+                    }
+
+                    break;
+
+                case 5:
+                    Console.WriteLine("Введите имя пользователя: ");
+                    string name = Console.ReadLine();
+
+                    BankUser userBalance = bank.bankUsers.Find(u =>u.Nikname == name);
+
+                    if (userBalance == null)
+                    {
+                        Console.WriteLine("Пользователь не найден.");
+                    }
+
+                    else
+                    {
+                        bank.ViewBalance(userBalance);
+                    }
+                    break;
+                case 6:
+                    Environment.Exit(0);
+                    break;
+                default:
+                    Console.WriteLine("Ошибка ввода.");
+                    break;
+            }
+        }
     }
 }
