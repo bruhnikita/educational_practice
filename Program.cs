@@ -4,6 +4,11 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Xml.Serialization;
 using System.Security.Cryptography;
+using System.Globalization;
+using CsvHelper;
+using CsvHelper.Configuration;
+using Excel = Microsoft.Office.Interop.Excel;
+
 
 //### Задание 1: Калькулятор
 /*Разработать консольное приложение, которое выполняет базовые
@@ -2842,149 +2847,289 @@ class Program
 using System;
 using System.Collections.Generic;
 
-public class ATMMachine
+//public class ATMMachine
+//{
+//    public List<BankUser> bankUsers { get; set; }
+
+//    public ATMMachine()
+//    {
+//        bankUsers = new List<BankUser>();
+//    }
+
+//    public void DepositFunds(BankUser user)
+//    {
+//        Console.WriteLine("Введите сумму для внесения: ");
+//        int amount;
+//        while (!int.TryParse(Console.ReadLine(), out amount) || amount <= 0)
+//        {
+//            Console.WriteLine("Неверная сумма. Попробуйте снова.");
+//        }
+
+//        user.BankAccount += amount;
+//    }
+
+//    public void WithdrawFunds(BankUser user)
+//    {
+//        Console.WriteLine("Введите сумму для снятия: ");
+//        int amount;
+//        while (!int.TryParse(Console.ReadLine(), out amount) || amount <= 0)
+//        {
+//            Console.WriteLine("Неверная сумма. Попробуйте снова.");
+//        }
+
+//        if (user.BankAccount < amount)
+//        {
+//            Console.WriteLine("Недостаточно средств на счете.");
+//            return;
+//        }
+
+//        user.BankAccount -= amount;
+//    }
+
+//    public void ViewBalance(BankUser user)
+//    {
+//        Console.WriteLine($"Ваш баланс: {user.BankAccount}");
+//    }
+
+//    public void AddUser()
+//    {
+//        try
+//        {
+//            bankUsers.Add(BankUser.Registration());
+//        }
+//        catch (Exception ex)
+//        {
+//            Console.WriteLine("Ошибка добавления пользователя: " + ex.Message);
+//            return;
+//        }
+//    }
+//}
+
+//public class BankUser
+//{
+//    public string Nikname { get; set; }
+//    private string Password { get; set; }
+//    public int BankAccount { get; set; }
+
+//    private bool isAuth { get; set; }
+
+//    private Dictionary<string, string> UserData;
+
+//    public BankUser(string name, string password)
+//    {
+//        Nikname = name;
+//        Password = password;
+//        UserData = new Dictionary<string, string>();
+//        isAuth = false;
+
+//        BankAccount = 0;
+//    }
+
+//    public static BankUser Registration()
+//    {
+//        Console.WriteLine("Введите имя пользователя: ");
+//        string name = Console.ReadLine();
+
+//        while (string.IsNullOrEmpty(name))
+//        {
+//            Console.WriteLine("Поле имени не может быть пустым. Попробуйте снова");
+//            name = Console.ReadLine();
+//        }
+
+//        Console.WriteLine("Введите пароль: ");
+//        string password = Console.ReadLine();
+
+//        while (string.IsNullOrEmpty(password))
+//        {
+//            Console.WriteLine("Пароль не может быть пустым. Попробуйте снова.");
+//            password = Console.ReadLine();
+//        }
+
+//        BankUser newUser = new BankUser(name, password);
+
+//        return newUser;
+//    }
+
+//    public void Authorization(List<BankUser> listUsers)
+//    {
+//        int attempts = 0;
+//        while (attempts < 3)
+//        {
+//            Console.WriteLine("Введите имя пользователя: ");
+//            string authName = Console.ReadLine();
+
+//            if (string.IsNullOrEmpty(authName))
+//            {
+//                Console.WriteLine("Имя пользователя не может быть пустым. Введите снова.");
+//                attempts++;
+//                continue;
+//            }
+
+//            Console.WriteLine("Введите пароль: ");
+//            string authPass = Console.ReadLine();
+
+//            if (string.IsNullOrEmpty(authPass))
+//            {
+//                Console.WriteLine("Пароль не может быть пустым. Попробуйте снова.");
+//                attempts++;
+//                continue;
+//            }
+
+//            foreach (BankUser user in listUsers)
+//            {
+//                if (user.Nikname == authName && user.Password == authPass)
+//                {
+//                    Console.WriteLine("Авторизация прошла успешно.");
+//                    user.isAuth = true;
+//                    return;
+//                }
+//            }
+
+//            Console.WriteLine("Неверное имя пользователя или пароль. Попробуйте снова.");
+//            attempts++;
+//        }
+
+//        Console.WriteLine("Превышен лимит попыток. Авторизация не удалась.");
+//    }
+//}
+
+//class Program
+//{
+//    static void Main(string[] args)
+//    {
+//        ATMMachine bank = new ATMMachine();
+
+//        int choice;
+//        while (true)
+//        {
+//            Console.WriteLine("Введите действие:\n1 - Зарегистрировать пользователя\n2 - Авторизоваться\n" +
+//                "3 - Внести наличные\n4 - Снять наличные\n5 - Показать абаланс\n6 - Выход");
+
+//            try
+//            {
+//                choice = int.Parse(Console.ReadLine());
+//            }
+//            catch (Exception e)
+//            {
+//                Console.WriteLine("Неверный ввод. Попробуйте еще раз.");
+//                continue;
+//            }
+
+//            switch (choice)
+//            {
+//                case 1:
+//                    bank.AddUser();
+//                    break;
+//                case 2:
+//                    BankUser user = new BankUser("", "");
+//                    user.Authorization(bank.bankUsers);
+//                    break;
+//                case 3:
+//                    Console.WriteLine("Введите имя пользователя: ");
+//                    string depositUserName = Console.ReadLine();
+
+//                    BankUser depositUser = bank.bankUsers.Find(u => u.Nikname == depositUserName);
+
+//                    if (depositUserName == null)
+//                    {
+//                        Console.WriteLine("Пользователь не найден.");
+//                    }
+
+//                    else
+//                    {
+//                        bank.DepositFunds(depositUser);
+//                    }
+//                    break;
+
+//                case 4:
+//                    Console.WriteLine("Введите имя пользователя: ");
+//                    string withdrawFundsUser = Console.ReadLine();
+
+//                    BankUser withdrawFundUser = bank.bankUsers.Find(u => u.Nikname ==  withdrawFundsUser);
+
+//                    if (withdrawFundUser == null)
+//                    {
+//                        Console.WriteLine("Имя пользователя не может быть пустым.");
+//                    }
+
+//                    else
+//                    {
+//                        bank.WithdrawFunds(withdrawFundUser);
+//                    }
+
+//                    break;
+
+//                case 5:
+//                    Console.WriteLine("Введите имя пользователя: ");
+//                    string name = Console.ReadLine();
+
+//                    BankUser userBalance = bank.bankUsers.Find(u =>u.Nikname == name);
+
+//                    if (userBalance == null)
+//                    {
+//                        Console.WriteLine("Пользователь не найден.");
+//                    }
+
+//                    else
+//                    {
+//                        bank.ViewBalance(userBalance);
+//                    }
+//                    break;
+//                case 6:
+//                    Environment.Exit(0);
+//                    break;
+//                default:
+//                    Console.WriteLine("Ошибка ввода.");
+//                    break;
+//            }
+//        }
+//    }
+//}
+
+/*Задание 41: Парсинг CSV-файлов
+Создать программу, которая читает данные из CSV-файла и выводит их в
+формате таблицы.*/
+/*
+Файл записан вручную, смотри persons.csv в папке проекта*/
+
+/*public class CSVReader
 {
-    public List<BankUser> bankUsers { get; set; }
-
-    public ATMMachine()
+    public void ReadCSVFile(string filePath)
     {
-        bankUsers = new List<BankUser>();
-    }
-
-    public void DepositFunds(BankUser user)
-    {
-        Console.WriteLine("Введите сумму для внесения: ");
-        int amount;
-        while (!int.TryParse(Console.ReadLine(), out amount) || amount <= 0)
+        CsvConfiguration csvConfiguration = new CsvConfiguration(CultureInfo.CurrentCulture)
         {
-            Console.WriteLine("Неверная сумма. Попробуйте снова.");
-        }
+            HasHeaderRecord = false,
+            Comment = '#',
+            AllowComments = true,
+            Delimiter = ",",
+        };
 
-        user.BankAccount += amount;
-    }
+        using StreamReader streamReader = File.OpenText(filePath);
+        using CsvReader reader = new CsvReader(streamReader, csvConfiguration);
 
-    public void WithdrawFunds(BankUser user)
-    {
-        Console.WriteLine("Введите сумму для снятия: ");
-        int amount;
-        while (!int.TryParse(Console.ReadLine(), out amount) || amount <= 0)
+        var records = reader.GetRecords<Person>();
+
+        Console.WriteLine($"{"Name",-15} {"Surname",-15} {"Profession",-20}");
+        Console.WriteLine(new string('-', 50));
+
+        foreach (var person in records)
         {
-            Console.WriteLine("Неверная сумма. Попробуйте снова.");
-        }
-
-        if (user.BankAccount < amount)
-        {
-            Console.WriteLine("Недостаточно средств на счете.");
-            return;
-        }
-
-        user.BankAccount -= amount;
-    }
-
-    public void ViewBalance(BankUser user)
-    {
-        Console.WriteLine($"Ваш баланс: {user.BankAccount}");
-    }
-
-    public void AddUser()
-    {
-        try
-        {
-            bankUsers.Add(BankUser.Registration());
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Ошибка добавления пользователя: " + ex.Message);
-            return;
+            Console.WriteLine($" {person.Name,-15} {person.Surname,-15} {person.Occupation,-20}");
         }
     }
 }
 
-public class BankUser
+public class Person
 {
-    public string Nikname { get; set; }
-    private string Password { get; set; }
-    public int BankAccount { get; set; }
+    public string Name { get; set; }
+    public string Surname { get; set; }
+    public string Occupation { get; set; }
 
-    private bool isAuth { get; set; }
-
-    private Dictionary<string, string> UserData;
-
-    public BankUser(string name, string password)
+    public Person(string name, string surname, string occupation)
     {
-        Nikname = name;
-        Password = password;
-        UserData = new Dictionary<string, string>();
-        isAuth = false;
-
-        BankAccount = 0;
-    }
-
-    public static BankUser Registration()
-    {
-        Console.WriteLine("Введите имя пользователя: ");
-        string name = Console.ReadLine();
-
-        while (string.IsNullOrEmpty(name))
-        {
-            Console.WriteLine("Поле имени не может быть пустым. Попробуйте снова");
-            name = Console.ReadLine();
-        }
-
-        Console.WriteLine("Введите пароль: ");
-        string password = Console.ReadLine();
-
-        while (string.IsNullOrEmpty(password))
-        {
-            Console.WriteLine("Пароль не может быть пустым. Попробуйте снова.");
-            password = Console.ReadLine();
-        }
-
-        BankUser newUser = new BankUser(name, password);
-
-        return newUser;
-    }
-
-    public void Authorization(List<BankUser> listUsers)
-    {
-        int attempts = 0;
-        while (attempts < 3)
-        {
-            Console.WriteLine("Введите имя пользователя: ");
-            string authName = Console.ReadLine();
-
-            if (string.IsNullOrEmpty(authName))
-            {
-                Console.WriteLine("Имя пользователя не может быть пустым. Введите снова.");
-                attempts++;
-                continue;
-            }
-
-            Console.WriteLine("Введите пароль: ");
-            string authPass = Console.ReadLine();
-
-            if (string.IsNullOrEmpty(authPass))
-            {
-                Console.WriteLine("Пароль не может быть пустым. Попробуйте снова.");
-                attempts++;
-                continue;
-            }
-
-            foreach (BankUser user in listUsers)
-            {
-                if (user.Nikname == authName && user.Password == authPass)
-                {
-                    Console.WriteLine("Авторизация прошла успешно.");
-                    user.isAuth = true;
-                    return;
-                }
-            }
-
-            Console.WriteLine("Неверное имя пользователя или пароль. Попробуйте снова.");
-            attempts++;
-        }
-
-        Console.WriteLine("Превышен лимит попыток. Авторизация не удалась.");
+        Name = name;
+        Surname = surname;
+        Occupation = occupation;
     }
 }
 
@@ -2992,91 +3137,176 @@ class Program
 {
     static void Main(string[] args)
     {
-        ATMMachine bank = new ATMMachine();
+        CSVReader reader = new CSVReader();
+        reader.ReadCSVFile("persons.csv");
+    }
+}*/
 
-        int choice;
-        while (true)
+/*Задание 42: Калькулятор средней температуры
+Разработать приложение, которое вычисляет среднюю температуру за неделю
+по введенным пользователем данным*/
+
+/*public class AverageTemperatureCalculator
+{
+    public int[] daysTemperature {  get; set; }
+
+    public AverageTemperatureCalculator()
+    {
+        daysTemperature = new int[7];
+        AddDaysTemp();
+    }
+
+    public void AddDaysTemp()
+    {
+        Console.WriteLine("Вводите по очереди температуру в каждый из дней недели: ");
+        for (int i = 0; i < daysTemperature.Length; i++)
         {
-            Console.WriteLine("Введите действие:\n1 - Зарегистрировать пользователя\n2 - Авторизоваться\n" +
-                "3 - Внести наличные\n4 - Снять наличные\n5 - Показать абаланс\n6 - Выход");
-
-            try
+            while (true)
             {
-                choice = int.Parse(Console.ReadLine());
+                Console.WriteLine($"День: {i + 1}");
+                if (int.TryParse(Console.ReadLine(), out int temperature))
+                {
+                    daysTemperature[i] = temperature;
+                    break;
+                }
+
+                else
+                {
+                    Console.WriteLine("Неверный ввод.");
+                }
             }
-            catch (Exception e)
+        }
+        CalculateAverageTemperature();
+    }
+
+    public void CalculateAverageTemperature()
+    {
+        int sum = 0;
+        foreach (int i in daysTemperature)
+        {
+            sum += i;
+        }
+        Console.WriteLine("Средняя температура за неделю: " + sum / 7 + "°C");
+    }
+
+    static void Main(string[] args)
+    {
+        AverageTemperatureCalculator calculator = new AverageTemperatureCalculator();
+    }
+}*/
+
+/*Задание 44: Автоматический контроль версий
+Создать программу, которая отслеживает изменения в текстовых файлах в
+указанной директории и автоматически сохраняет копии изменений с отметкой
+времени*/
+/*public class VersionControler
+{
+    private readonly string _directoryPath;
+    private readonly string _backupDirectoryPath;
+
+    public VersionControler(string directoryPath, string backUpDirectoryPath)
+    {
+        _directoryPath = directoryPath;
+        _backupDirectoryPath = backUpDirectoryPath;
+    }
+
+    public void StartWatching()
+    {
+        using (var watcher = new FileSystemWatcher(_directoryPath))
+        {
+            watcher.NotifyFilter = NotifyFilters.LastWrite;
+            watcher.Filter = "*.txt";
+            watcher.Changed += OnChanged;
+            watcher.EnableRaisingEvents = true;
+
+            Console.WriteLine($"Отслеживание файла {_directoryPath} началось.");
+            Console.ReadLine();
+        }
+    }
+
+    private void OnChanged(object source, FileSystemEventArgs e)
+    {
+        Console.WriteLine($"Файл {e.FullPath} был изменен.");
+
+        string backupDirectoryPath = $"{_backupDirectoryPath}\\{e.Name}";
+        string backupFilePath = $"{backupDirectoryPath}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt";
+
+        if (!Directory.Exists(backupDirectoryPath))
+        {
+            Directory.CreateDirectory(backupDirectoryPath);
+        }
+
+        File.Copy(e.FullPath, backupFilePath, true);
+
+        Console.WriteLine($"Резервная копия сохранена в {backupFilePath}");
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        //В корневой папке проекта можете посмотреть результат
+        string directoryPath = "C:\\Users\\RxGroup\\Desktop\\4 code\\projects\\educational practice\\educational practice\\bin\\Debug\\net8.0";
+        string backupDirectoryPath = @"C:\Users\RxGroup\Desktop\4 code\projects\educational practice\educational practice\bin\Debug\net8.0\backups";
+
+        VersionControler controler = new VersionControler(directoryPath, backupDirectoryPath);
+        controler.StartWatching();
+    }
+}
+*/
+
+/*Задание 45: Генерация отчетов
+Написать программу, которая генерирует отчет в текстовом формате на основе
+введенных пользователем данных (например, отчет по продажам, отчет по
+выполнению задач и т.д.)*/
+
+
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        Console.WriteLine("Введите данные для отчета (в формате дата;описание;сумма, дата;описание;сумма, ...): ");
+        string reportData = Console.ReadLine();
+
+        try
+        {
+            string[] dataRows = reportData.Split(',');
+
+            Excel.Application excelApp = new Excel.Application();
+            Excel.Workbook workbook = excelApp.Workbooks.Add();
+            Excel.Worksheet worksheet = (Excel.Worksheet)workbook.Worksheets.Add("Sheet1"); 
+
+            worksheet.Cells[1, 1] = "Дата";
+            worksheet.Cells[1, 2] = "Описание";
+            worksheet.Cells[1, 3] = "Сумма";
+
+            int rowIndex = 2;
+            foreach (string dataRow in dataRows)
             {
-                Console.WriteLine("Неверный ввод. Попробуйте еще раз.");
-                continue;
+                string[] columns = dataRow.Split(';');
+
+                if (columns.Length != 3)
+                {
+                    throw new Exception($"Неверный формат ввода: {dataRow}");
+                }
+
+                worksheet.Cells[rowIndex, 1] = columns[0];
+                worksheet.Cells[rowIndex, 2] = columns[1];
+                worksheet.Cells[rowIndex, 3] = columns[2];
+
+                rowIndex++;
             }
 
-            switch (choice)
-            {
-                case 1:
-                    bank.AddUser();
-                    break;
-                case 2:
-                    BankUser user = new BankUser("", "");
-                    user.Authorization(bank.bankUsers);
-                    break;
-                case 3:
-                    Console.WriteLine("Введите имя пользователя: ");
-                    string depositUserName = Console.ReadLine();
+            Excel.XlFileFormat fileFormat = Excel.XlFileFormat.xlOpenXMLWorkbook;
+            workbook.SaveAs("report.xlsx", fileFormat);
 
-                    BankUser depositUser = bank.bankUsers.Find(u => u.Nikname == depositUserName);
-
-                    if (depositUserName == null)
-                    {
-                        Console.WriteLine("Пользователь не найден.");
-                    }
-
-                    else
-                    {
-                        bank.DepositFunds(depositUser);
-                    }
-                    break;
-
-                case 4:
-                    Console.WriteLine("Введите имя пользователя: ");
-                    string withdrawFundsUser = Console.ReadLine();
-
-                    BankUser withdrawFundUser = bank.bankUsers.Find(u => u.Nikname ==  withdrawFundsUser);
-
-                    if (withdrawFundUser == null)
-                    {
-                        Console.WriteLine("Имя пользователя не может быть пустым.");
-                    }
-
-                    else
-                    {
-                        bank.WithdrawFunds(withdrawFundUser);
-                    }
-
-                    break;
-
-                case 5:
-                    Console.WriteLine("Введите имя пользователя: ");
-                    string name = Console.ReadLine();
-
-                    BankUser userBalance = bank.bankUsers.Find(u =>u.Nikname == name);
-
-                    if (userBalance == null)
-                    {
-                        Console.WriteLine("Пользователь не найден.");
-                    }
-
-                    else
-                    {
-                        bank.ViewBalance(userBalance);
-                    }
-                    break;
-                case 6:
-                    Environment.Exit(0);
-                    break;
-                default:
-                    Console.WriteLine("Ошибка ввода.");
-                    break;
-            }
+            excelApp.Quit();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка: {ex.Message}");
         }
     }
 }
