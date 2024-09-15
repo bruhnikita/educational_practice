@@ -2846,6 +2846,7 @@ class Program
 снятие средств, просмотр баланса*/
 using System;
 using System.Collections.Generic;
+using Microsoft.Office.Interop.Excel;
 
 //public class ATMMachine
 //{
@@ -3262,27 +3263,23 @@ class Program
 выполнению задач и т.д.)*/
 
 
-
-class Program
+/*class Program
 {
     static void Main(string[] args)
     {
-        Console.WriteLine("Введите данные для отчета (в формате дата;описание;сумма, дата;описание;сумма, ...): ");
+        Console.Write("Введите данные для отчета (в формате дата;описание;сумма, дата;описание;сумма, ...): ");
         string reportData = Console.ReadLine();
 
         try
         {
             string[] dataRows = reportData.Split(',');
 
-            Excel.Application excelApp = new Excel.Application();
-            Excel.Workbook workbook = excelApp.Workbooks.Add();
-            Excel.Worksheet worksheet = (Excel.Worksheet)workbook.Worksheets.Add("Sheet1"); 
+            Console.WriteLine("Отчет:");
+            Console.WriteLine("---------------------------------------------------");
+            Console.WriteLine("| Дата       | Описание          | Сумма      |");
+            Console.WriteLine("---------------------------------------------------");
 
-            worksheet.Cells[1, 1] = "Дата";
-            worksheet.Cells[1, 2] = "Описание";
-            worksheet.Cells[1, 3] = "Сумма";
-
-            int rowIndex = 2;
+            int rowIndex = 1;
             foreach (string dataRow in dataRows)
             {
                 string[] columns = dataRow.Split(';');
@@ -3292,21 +3289,341 @@ class Program
                     throw new Exception($"Неверный формат ввода: {dataRow}");
                 }
 
-                worksheet.Cells[rowIndex, 1] = columns[0];
-                worksheet.Cells[rowIndex, 2] = columns[1];
-                worksheet.Cells[rowIndex, 3] = columns[2];
+                Console.WriteLine($"| {columns[0].PadRight(10)} | {columns[1].PadRight(20)} | {columns[2].PadRight(10)} |");
 
                 rowIndex++;
             }
 
-            Excel.XlFileFormat fileFormat = Excel.XlFileFormat.xlOpenXMLWorkbook;
-            workbook.SaveAs("report.xlsx", fileFormat);
-
-            excelApp.Quit();
+            Console.WriteLine("---------------------------------------------------");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Ошибка: {ex.Message}");
         }
+
+        Console.ReadKey();
+    }
+}*/
+
+/*public class PublicEvent
+{
+    public List<Visitor> listOfVisitors { get; set; }
+
+    public PublicEvent()
+    {
+        listOfVisitors = new List<Visitor>();
+    }
+
+    public void AddVisitors()
+    {
+        Console.WriteLine("Введите количество посетителей: ");
+        int count = int.Parse(Console.ReadLine());
+
+        for (int i = 0; i < count; i++)
+        {
+            Console.Clear();
+
+            string name;
+            while (true)
+            {
+                Console.WriteLine("Введите имя посетителя: ");
+                name = Console.ReadLine();
+
+                if (!string.IsNullOrWhiteSpace(name))
+                {
+                    break;
+                }
+
+                Console.WriteLine("Ошибка ввода. Имя не может быть пустым.");
+            }
+
+            string surname;
+            while (true)
+            {
+                Console.WriteLine("Введите фамилию посетителя: ");
+                surname = Console.ReadLine();
+
+                if (!string.IsNullOrWhiteSpace(surname))
+                {
+                    break;
+                }
+
+                Console.WriteLine("Ошибка ввода. Фамилия не может быть пустой.");
+            }
+
+            int age;
+            while (true)
+            {
+                Console.WriteLine("Введите возраст посетителя: ");
+                if (int.TryParse(Console.ReadLine(), out age) && age > 0)
+                {
+                    break;
+                }
+
+                Console.WriteLine("Ошибка ввода. Возраст не может быть отрицательным или равным нулю.");
+            }
+
+            Visitor newVisitor = new Visitor(name, surname, age);
+            listOfVisitors.Add(newVisitor);
+
+            Console.WriteLine("Посетитель добавлен.");
+        }
+    }
+
+    public void RemoveVisitors(string targetName)
+    {
+        if (listOfVisitors.Count <= 0)
+        {
+            Console.WriteLine("Список посетителей всё еще пуст. Добавьте посетителей.");
+            return;
+        }
+
+        for (int i = listOfVisitors.Count - 1; i >= 0; i--)
+        {
+            if (listOfVisitors[i].Name == targetName)
+            {
+                try
+                {
+                    listOfVisitors.RemoveAt(i);
+                    Console.WriteLine("Пользователь удален.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Ошибка удаления пользователя. Попробуйте снова.");
+                    return;
+                }
+            }
+        }
+
+        Console.WriteLine("Посетитель с таким именем не найден.");
+    }
+
+    public void PrintListOfVisitors()
+    {
+        if (listOfVisitors == null || listOfVisitors.Count <= 0)
+        {
+            Console.WriteLine("Список посетителей все еще пуст. Попробуйте снова.");
+            return;
+        }
+
+        Console.WriteLine($"Количество посетителей: {listOfVisitors.Count}:\n\nИмя\tФамилия\tВозраст\tСтатус");
+        foreach (var visitor in listOfVisitors)
+        {
+            string status = visitor.isHere ? "Присутствует" : "Отсутствует";
+            Console.WriteLine($"{visitor.Name}\t{visitor.Surname}\t{visitor.Age}\t{status}");
+        }
+    }
+
+    public void MarkAsHere(string targetName)
+    {
+        if (listOfVisitors == null || listOfVisitors.Count <= 0)
+        {
+            Console.WriteLine("Список все еще пуст. Добавьте посетителей.");
+            return;
+        }
+
+        foreach (var visitor in listOfVisitors)
+        {
+            if (visitor.Name == targetName)
+            {
+                try
+                {
+                    visitor.isHere = true;
+                    Console.WriteLine("Посетитель отмечен.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Ошибка: " + ex.Message);
+                    return;
+                }
+            }
+        }
+    }
+
+    public class Visitor
+    {
+        public string Name { get; set; }
+        public string Surname { get; set; }
+        public int Age { get; set; }
+        public bool isHere;
+
+        public Visitor(string name, string surname, int age)
+        {
+            Name = name;
+            Surname = surname;
+            Age = age;
+            isHere = false;
+        }
     }
 }
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        PublicEvent eventManager = new PublicEvent();
+
+        while (true)
+        {
+            Console.WriteLine("Введите действие:\n1 - Добавить посетителей\n2 - Удалить посетителей\n3 - Отметить как пришедшего\n4 - Вывести список посетителей\n5 - Выход ");
+            int choice = int.Parse(Console.ReadLine());
+
+            switch (choice)
+            {
+                case 1:
+                    eventManager.AddVisitors();
+                    break;
+                case 2:
+                    Console.WriteLine("Введите имя посетителя для удаления: ");
+                    string targetName = Console.ReadLine();
+                    eventManager.RemoveVisitors(targetName);
+                    break;
+                case 3:
+                    Console.WriteLine("Введите имя посетителя для отметки: ");
+                    targetName = Console.ReadLine();
+                    eventManager.MarkAsHere(targetName);
+                    break;
+                case 4:
+                    eventManager.PrintListOfVisitors();
+                    break;
+                case 5:
+                    return;
+                default:
+                    Console.WriteLine("Неверный выбор. Попробуйте снова.");
+                    break;
+            }
+        }
+    }
+}*/
+
+
+/*Задание 47: Планировщик задач
+Разработать программу, которая позволяет пользователю создавать задачи,
+задавать для них время выполнения и уведомляет о наступлении времени
+выполнения задачи*/
+
+
+
+/*public class TaskScheduler
+{
+    private Timer Timer { get; set; }
+    private List<Task> tasks { get; set; }
+
+    public TaskScheduler()
+    {
+        tasks = new List<Task>();
+        Timer = new Timer(CheckTimeForTask, null, 1000, 1000);
+    }
+
+    public void AddTask(Task task)
+    {
+        tasks.Add(task);
+    }
+
+    public void RemoveTask(string name)
+    {
+        Task targetTask = tasks.FirstOrDefault(task => task.Name == name);
+        if (targetTask != null)
+        {
+            tasks.Remove(targetTask);
+            Console.WriteLine("Задача удалена.");
+        }
+        else
+        {
+            Console.WriteLine("Задача с таким именем не найдена.");
+        }
+    }
+
+    public void PrintTasksList()
+    {
+        Console.WriteLine("Задача\tВремя выполнения\tСтатус");
+        foreach (var task in tasks)
+        {
+            string status = task.IsCompleted ? "Ожидает выполнения" : "Выполнена";
+            Console.WriteLine($"{task.Name}\t{task.ExecutionTime}\t{status}");
+        }
+    }
+
+    public void CheckTimeForTask(object state)
+    {
+        foreach(var task in tasks)
+        {
+            if (task.ExecutionTime <= DateTime.Now && !task.IsCompleted)
+            {
+                NotifyUser(task);
+                task.IsCompleted = true;
+            }
+        }
+    }
+
+    private void NotifyUser(Task task)
+    {
+        Console.WriteLine($"Пришло время для выполнения задачи: {task.Name}");
+    }
+    public class Task
+    {
+        public string Name { get; set; }
+        public DateTime ExecutionTime { get; set; }
+        public bool IsCompleted { get; set; }
+
+        public Task(string name, DateTime executionTime)
+        {
+            Name = name;
+            ExecutionTime = executionTime;
+            IsCompleted = false;
+        }
+    }
+
+    static void Main(string[] args)
+    {
+        TaskScheduler scheduler = new TaskScheduler();
+
+        while (true)
+        {
+            Console.WriteLine("Выберите действие:");
+            Console.WriteLine("1 - Добавить задачу");
+            Console.WriteLine("2 - Удалить задачу");
+            Console.WriteLine("3 - Вывести список задач");
+            Console.WriteLine("4 - Выход");
+
+            int choice = int.Parse(Console.ReadLine());
+
+            switch (choice)
+            {
+                case 1:
+                    Console.Write("Введите имя задачи: ");
+                    string taskName = Console.ReadLine();
+
+                    Console.Write("Введите время выполнения задачи (в формате dd.MM.yyyy HH:mm): ");
+                    try
+                    {
+                        DateTime executionTime = DateTime.Parse(Console.ReadLine());
+                        Task task = new Task(taskName, executionTime);
+                        scheduler.AddTask(task);
+                    }
+                    catch (FormatException)
+                    {
+                        Console.WriteLine("Ошибка ввода времени выполнения задачи.");
+                    }
+                    break;
+                case 2:
+                    Console.WriteLine("Введите имя задачи: ");
+                    string name = Console.ReadLine();
+                    scheduler.RemoveTask(name);
+                    break;
+                case 3:
+                    scheduler.PrintTasksList();
+                    break;
+                case 4:
+                    return;
+                default:
+                    Console.WriteLine("Неверный выбор. Пожалуйста, выберите снова.");
+                    break;
+            }
+        }
+    }
+}
+
+*/
+
+
