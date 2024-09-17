@@ -2847,6 +2847,8 @@ class Program
 using System;
 using System.Collections.Generic;
 using Microsoft.Office.Interop.Excel;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.ComponentModel.Design;
 
 //public class ATMMachine
 //{
@@ -3627,3 +3629,205 @@ class Program
 */
 
 
+/*Задание 48: Анализ продаж
+Написать приложение, которое анализирует данные о продажах и выводит
+статистику по проданным товарам (общая сумма продаж, количество проданных
+единиц каждого товара и т.д.)*/
+
+public class SalesAnalyst
+{   
+    public List<Product> Products;
+    public int CountOfSales {  get; set; }
+    public double SaleSum { get; set; }
+
+    public SalesAnalyst() 
+    {
+        Products = new List<Product>();
+        CountOfSales = 0;
+        SaleSum = 0;
+    }   
+
+    public void AddProduct()
+    {
+        Console.WriteLine("Введите наименование продукта: ");
+        string name = Console.ReadLine();
+
+        if (name == null || string.IsNullOrEmpty(name))
+        {
+            Console.WriteLine("Имя товара не может быть пустым. Попробуйте снова.");
+            Console.Clear();
+            return;
+        }
+
+        Console.WriteLine("Введите цену товара: ");
+        double price = double.Parse(Console.ReadLine());
+
+        if (price <= 0)
+        {
+            Console.WriteLine("Цена товара не может быть меньше или равна нулю. Введите снова.");
+            Console.Clear();
+            return;
+        }
+
+        Console.WriteLine("Введите количество продукта: ");
+        int count = int.Parse(Console.ReadLine());
+
+        if (count <= 0)
+        {
+            Console.WriteLine("Количество товара не может быть меньше или равно нулю. Введите снова.");
+            Console.Clear();
+            return;
+        }
+
+        try
+        {
+            Product newProduct = new Product(name, price, count);
+            Products.Add(newProduct);
+            Console.WriteLine("Товар добавлен.");
+        }
+
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка добавления товара: {ex.Message}. Попробуйте снова.");
+            Console.Clear();
+            return;
+        }
+    }
+
+    public void SellProduct(SalesAnalyst analyst)
+    {
+        Console.WriteLine("Введите имя товара для продажи: ");
+        string name = Console.ReadLine() ;
+
+        if (name == null || string.IsNullOrEmpty(name))
+        {
+            Console.WriteLine("Имя товара не может быть пустым. Попробуйте снова.");
+            Console.Clear();
+            return;
+        }
+
+        bool isFind = false;
+        foreach (Product product in Products)
+        {
+            if (product.Name == name)
+            {
+                Console.WriteLine("Введите количество единиц товара для продажи: ");
+                int countOfSale = int.Parse(Console.ReadLine());
+
+                if (countOfSale <= 0)
+                {
+                    Console.WriteLine("Количество продаж не может быть меньше или равно нулю. Попробуйте снова.");
+                    Console.Clear();
+                    return;
+                }
+
+                else if (product.Count < countOfSale)
+                {
+                    Console.WriteLine("Количество продаж превышает количество имеющегося товара. Попробуйте снова.");
+                    Console.Clear();
+                    return;
+                }
+
+                else
+                {
+                    isFind = true;
+
+                    try
+                    {
+                        product.Count -= countOfSale;
+                        product.numberOfSales += countOfSale;
+                        analyst.CountOfSales += countOfSale;
+                        analyst.SaleSum += countOfSale * product.Price;
+
+                        Console.Clear();
+                        Console.WriteLine("Товар успешно продан.");
+                    }
+
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Ошибка продажи товара: {ex.Message}");
+                        Console.Clear();
+                        return;
+                    }
+                }
+            }
+        }
+
+        if (!isFind)
+        {
+            Console.WriteLine("Товар с таким именем не найден. Попробуйте снова.");
+            Console.Clear();
+            return;
+        }
+    }
+
+    public void PrintProductList(SalesAnalyst analyst)
+    {
+        if (Products.Count <= 0)
+        {
+            Console.WriteLine("Список товаров все еще пуст. Добавьте товары.");
+            Console.Clear();
+            return;
+        }
+
+        Console.WriteLine($"Название товара\tЦена товара\tКоличество имеющегося товара\tКоличество проданных единиц товара");
+        foreach (Product product in Products)
+        {
+            Console.WriteLine($"{product.Name}\t{product.Price}\t{product.Count}\t{product.numberOfSales}");
+        }
+
+        Console.WriteLine($"------------------------------------------------------------------------------------------------\nИТОГО ПРОДАНО ТОВАРОВ: {analyst.CountOfSales} НА СУММУ {analyst.SaleSum}");
+    }
+
+
+    public class Product
+    {
+        public string Name { get; set; }
+        public double Price { get; set; }
+        public int Count { get; set; }
+        public int numberOfSales { get; set; }
+
+        public Product(string name, double price, int count)
+        {
+            Name = name;
+            Price = price;
+            Count = count;
+            numberOfSales = 0;
+        }
+    }
+
+    static void Main(string[] args)
+    {
+        SalesAnalyst analyst = new SalesAnalyst();
+        bool isExit = false;
+
+        while (!isExit)
+        {
+            Console.WriteLine("Введите действие:\n1 - Добавить товар\n2 - Продать товар\n3 - Вывести список итоговый отчёт продаж\n4 - Выход");
+            int choice = int.Parse(Console.ReadLine());
+
+            switch (choice)
+            {
+                case 1:
+                    analyst.AddProduct();
+                    break;
+
+                case 2:
+                    analyst.SellProduct(analyst);
+                    break;
+
+                case 3:
+                    analyst.PrintProductList(analyst);
+                    break;
+
+                case 4:
+                    isExit = true;
+                    break;
+                default:
+                    Console.WriteLine("Ошибка ввода. Попробуйте снова.");
+                    break;
+            }
+
+        }
+    }
+}
