@@ -3832,6 +3832,455 @@ class Program
     }
 }*/
 
+/*Задание 49: Игра "Виселица"
+Создать консольное приложение, которое симулирует игру "Виселица".
+Пользователь должен угадывать загаданное слово по буквам*/
+/*class Programm
+{
+    static void Main(string[] args)
+    {
+        string[] Words = new string[] {
+            "Привет",
+            "Мир",
+            "Солнце",
+            "Книга",
+            "Стул",
+            "Яблоко",
+            "Цветы",
+            "Дождь",
+            "Гора",
+            "Река",
+            "Лес",
+            "Птица",
+            "Кошка",
+            "Собака",
+            "Дом",
+            "Машина",
+            "Телефон",
+            "Компьютер",
+            "Музыка",
+            "Фильм",
+            "Любовь",
+            "Дружба",
+            "Счастье",
+            "Мечта",
+            "Время",
+            "Жизнь",
+            "Смерть",
+            "Бог",
+            "Дьявол",
+            "Ангел"
+        };
+        Random rand = new Random();
+        string word = Words[rand.Next(0, Words.Length)];
+        char letter;
+        bool[] letters = new bool[word.Length];
+        bool exit = true;
+        int counter = 0, wordTrue = word.Length;
+        int lives = 7;
+        for (int i = 0; i < word.Length; i++)
+        {
+            Console.Write("_");
+        }
+        Console.WriteLine();
+        while (exit)
+        {
+            Console.WriteLine("Введите букву");
+            Console.WriteLine($"Ваши жизни {lives}");
+            letter = Char.ToLower(Console.ReadKey().KeyChar);
+            Console.Clear();
+            for (int i = 0; i < word.Length; i++)
+            {
+                if (letter == word[i])
+                    letters[i] = true;
+                if (letters[i])
+                    Console.Write(word[i]);
+                else
+                    Console.Write("_");
+            }
+            if (cheak(word, letter) == 1)
+            {
+                lives = lives - cheak(word, letter);
+                gallows(lives);
+            }
+            for (int i = 0; i < word.Length; i++)
+            {
+                if (letters[i])
+                    counter++;
+            }
+            Console.WriteLine();
+            if (counter == wordTrue)
+            {
+                Console.WriteLine("Поздравляю с победой");
+                exit = false;
+            }
+            if (lives == 0)
+            {
+                Console.WriteLine("Вас повешали");
+                exit = false;
+                Console.WriteLine($"Слово было {word}");
+            }
+            counter = 0;
+        }
+    }
+    static public int cheak(string word, char letter)
+    {
+        for (int i = 0; i < word.Length; i++)
+        {
+            if (letter == word[i])
+            {
+                return 0;
+            }
+        }
+        return 1;
+    }
+    static public void gallows(int lives)
+    {
+        Console.WriteLine();
+        switch (lives)
+        {
+            case 0:
+                Console.WriteLine("Нарисована правая нога");
+                break;
+            case 1:
+                Console.WriteLine("Нарисована левая нога");
+                break;
+            case 2:
+                Console.WriteLine("Нарисована левая рука");
+                break;
+            case 3:
+                Console.WriteLine("Нарисована правая рука");
+                break;
+            case 4:
+                Console.WriteLine("Нарисовано тело");
+                break;
+            case 5:
+                Console.WriteLine("Нарисована голова");
+                break;
+            case 6:
+                Console.WriteLine("Нарисована висельница");
+                break;
+        }
+    }
+}*/
+
+/*Задание 50: Система опросов
+Разработать систему опросов, которая позволяет создавать опросы, добавлять в
+них вопросы и варианты ответов, а затем собирать и анализировать ответы
+пользователей.*/
+/*namespace SurveySystem
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            List<Survey> surveys = new List<Survey>();
+
+            while (true)
+            {
+                Console.WriteLine("Выберите действие:");
+                Console.WriteLine("1. Создать опрос");
+                Console.WriteLine("2. Пройти опрос");
+                Console.WriteLine("3) Посмотреть результаты");
+                Console.WriteLine("4. Выход");
+
+                int choice = int.Parse(Console.ReadLine());
+
+                switch (choice)
+                {
+                    case 1:
+                        surveys.Add(CreateSurvey());
+                        break;
+                    case 2:
+                        TakeSurvey(surveys);
+                        break;
+                    case 3:
+                        if (surveys.Count == 0)
+                        {
+                            Console.WriteLine("Нет доступных опросов.");
+                            break;
+                        }
+
+                        Console.WriteLine("Доступные опросы:");
+                        for (int i = 0; i < surveys.Count; i++)
+                        {
+                            Console.WriteLine($"{i + 1}. {surveys[i].Name}");
+                        }
+
+                        int surveyIndex = GetIntInput("Выберите номер опроса: ") - 1;
+                        if (surveyIndex < 0 || surveyIndex >= surveys.Count)
+                        {
+                            Console.WriteLine("Неверный выбор опроса.");
+                        }
+                        surveys[surveyIndex].ShowResults();
+                        break;
+                    case 4:
+                        Console.WriteLine("До свидания!");
+                        return;
+                    default:
+                        Console.WriteLine("Неверный выбор. Попробуйте снова.");
+                        break;
+                }
+            }
+        }
+
+        static Survey CreateSurvey()
+        {
+            Console.WriteLine("Создание нового опроса:");
+            Console.Write("Введите название опроса: ");
+            string name = Console.ReadLine();
+
+            Survey survey = new Survey(name);
+
+            while (true)
+            {
+                Console.WriteLine("Добавить вопрос? (да/нет)");
+                string addQuestion = Console.ReadLine().ToLower();
+                if (addQuestion == "да")
+                {
+                    survey.AddQuestion(CreateQuestion());
+                }
+                else if (addQuestion == "нет")
+                {
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Неверный ввод");
+                }
+            }
+
+            return survey;
+        }
+
+        static Question CreateQuestion()
+        {
+            Console.WriteLine("Создание нового вопроса:");
+            Console.Write("Введите текст вопроса: ");
+            string text = Console.ReadLine();
+
+            Console.WriteLine("Выберите тип вопроса:");
+            Console.WriteLine("1. Открытый вопрос");
+            Console.WriteLine("2. Выбор одного варианта");
+            Console.WriteLine("3. Выбор нескольких вариантов");
+            int choice = GetIntInput("Введите номер типа вопроса: ");
+
+            QuestionType type = (QuestionType)choice;
+
+            Question question = new Question(text, type);
+
+            if (type == QuestionType.SingleChoice || type == QuestionType.MultipleChoice)
+            {
+                while (true)
+                {
+                    Console.WriteLine("Добавить вариант ответа? (да/нет)");
+                    string addAnswerChoice = Console.ReadLine().ToLower();
+                    if (addAnswerChoice == "да")
+                    {
+                        question.AddAnswerChoice(CreateAnswerChoice());
+                    }
+                    else if (addAnswerChoice == "нет")
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Неверный ввод. Попробуйте снова.");
+                    }
+                }
+            }
+
+            return question;
+        }
+
+        static AnswerChoice CreateAnswerChoice()
+        {
+            Console.Write("Введите текст варианта ответа: ");
+            string text = Console.ReadLine();
+            return new AnswerChoice(text);
+        }
+
+        static void TakeSurvey(List<Survey> surveys)
+        {
+            if (surveys.Count == 0)
+            {
+                Console.WriteLine("Нет доступных опросов.");
+                return;
+            }
+
+            Console.WriteLine("Доступные опросы:");
+            for (int i = 0; i < surveys.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {surveys[i].Name}");
+            }
+
+            int surveyIndex = GetIntInput("Выберите номер опроса: ") - 1;
+            if (surveyIndex < 0 || surveyIndex >= surveys.Count)
+            {
+                Console.WriteLine("Неверный выбор опроса.");
+                return;
+            }
+
+            Survey survey = surveys[surveyIndex];
+
+            Console.WriteLine($"Прохождение опроса '{survey.Name}':");
+            foreach (Question question in survey.Questions)
+            {
+                Console.WriteLine(question.Text);
+
+                if (question.Type == QuestionType.SingleChoice || question.Type == QuestionType.MultipleChoice)
+                {
+                    for (int i = 0; i < question.AnswerChoices.Count; i++)
+                    {
+                        Console.WriteLine($"{i + 1}. {question.AnswerChoices[i].Text}");
+                    }
+
+                    int choice = GetIntInput("Выберите вариант ответа: ") - 1;
+                    if (choice < 0 || choice >= question.AnswerChoices.Count)
+                    {
+                        Console.WriteLine("Неверный выбор варианта ответа.");
+                        continue;
+                    }
+
+                    survey.AddAnswer(question, question.AnswerChoices[choice]);
+                }
+                else
+                {
+                    Console.Write("Введите ваш ответ: ");
+                    string answer = Console.ReadLine();
+                    survey.AddAnswer(question, answer);
+                }
+            }
+
+            Console.WriteLine("Спасибо за прохождение опроса!");
+        }
+
+        static int GetIntInput(string prompt)
+        {
+            while (true)
+            {
+                Console.Write(prompt);
+                if (int.TryParse(Console.ReadLine(), out int result))
+                {
+                    return result;
+                }
+                Console.WriteLine("Неверный ввод. Попробуйте снова.");
+            }
+        }
+    }
+
+    enum QuestionType
+    {
+        Open,
+        SingleChoice,
+        MultipleChoice
+    }
+
+    class Survey
+    {
+        public string Name { get; private set; }
+        public List<Question> Questions { get; } = new List<Question>();
+        public List<Answer> Answers { get; } = new List<Answer>();
+
+        public Survey(string name)
+        {
+            Name = name;
+        }
+
+        public void AddQuestion(Question question)
+        {
+            Questions.Add(question);
+        }
+
+        public void AddAnswer(Question question, AnswerChoice answerChoice)
+        {
+            Answers.Add(new Answer(question, answerChoice));
+        }
+
+        public void AddAnswer(Question question, string answer)
+        {
+            Answers.Add(new Answer(question, answer));
+        }
+
+        public void ShowResults()
+        {
+            Console.WriteLine($"Результаты опроса '{Name}':");
+
+            foreach (Question question in Questions)
+            {
+                Console.WriteLine($"Вопрос: {question.Text}");
+
+                if (question.Type == QuestionType.Open)
+                {
+                    var answers = Answers.Where(a => a.Question == question).Select(a => a.TextAnswer).ToList();
+                    Console.WriteLine($"Ответы: {string.Join(", ", answers)}");
+                }
+                else
+                {
+                    var answerChoices = question.AnswerChoices;
+                    foreach (AnswerChoice choice in answerChoices)
+                    {
+                        var count = Answers.Count(a => a.Question == question && a.AnswerChoice == choice);
+                        Console.WriteLine($"{choice.Text}: {count} ответов");
+                    }
+                }
+            }
+        }
+    }
+
+    class Question
+    {
+        public string Text { get; private set; }
+        public QuestionType Type { get; private set; }
+        public List<AnswerChoice> AnswerChoices { get; } = new List<AnswerChoice>();
+
+        public Question(string text, QuestionType type)
+        {
+            Text = text;
+            Type = type;
+        }
+
+        public void AddAnswerChoice(AnswerChoice answerChoice)
+        {
+            AnswerChoices.Add(answerChoice);
+        }
+    }
+
+    class AnswerChoice
+    {
+        public string Text { get; private set; }
+
+        public AnswerChoice(string text)
+        {
+            Text = text;
+        }
+    }
+
+    class Answer
+    {
+        public Question Question { get; private set; }
+        public AnswerChoice AnswerChoice { get; private set; }
+        public string TextAnswer { get; private set; }
+
+        public Answer(Question question, AnswerChoice answerChoice)
+        {
+            Question = question;
+            AnswerChoice = answerChoice;
+        }
+
+        public Answer(Question question, string textAnswer)
+        {
+            Question = question;
+            TextAnswer = textAnswer;
+        }
+    }
+}*/
+
+/*Задание 51: Анализ погодных данных
+Создать программу, которая анализирует исторические данные о погоде
+(например, из CSV-файла) и выводит статистику по месяцам (средняя
+температура, количество осадков и т.д.)*/
+
 /*public class WeatherDataAnalyst
 {
     public int CountOfMonths = 3;
@@ -3921,3 +4370,196 @@ class Program
 }
 */
 
+/*Задание 52: Система учета книг в библиотеке
+Разработать консольное приложение для учета книг в библиотеке. Реализовать
+функции добавления, удаления, редактирования и поиска книг, а также
+возможность вывода списка всех книг*/
+
+/*namespace LibraryBookManagementSystem
+{
+    class Program
+    {
+        static List<Book> books = new List<Book>();
+        static string xmlFilePath = "books.xml";
+
+        static void Main(string[] args)
+        {
+            LoadBooksFromXml();
+
+            while (true)
+            {
+                Console.WriteLine("Система управления книгами в библиотеке");
+                Console.WriteLine("1. Добавить книгу");
+                Console.WriteLine("2. Удалить книгу");
+                Console.WriteLine("3. Редактировать книгу");
+                Console.WriteLine("4. Найти книгу");
+                Console.WriteLine("5. Показать все книги");
+                Console.WriteLine("6. Выход");
+
+                Console.Write("Выберите опцию: ");
+                int option = int.Parse(Console.ReadLine());
+
+                switch (option)
+                {
+                    case 1:
+                        AddBook();
+                        break;
+                    case 2:
+                        RemoveBook();
+                        break;
+                    case 3:
+                        EditBook();
+                        break;
+                    case 4:
+                        SearchBook();
+                        break;
+                    case 5:
+                        DisplayAllBooks();
+                        break;
+                    case 6:
+                        SaveBooksToXml();
+                        Environment.Exit(0);
+                        break;
+                    default:
+                        Console.WriteLine("Недопустимая опция. Пожалуйста, выберите допустимую опцию.");
+                        break;
+                }
+
+                Console.WriteLine();
+            }
+        }
+
+        static void AddBook()
+        {
+            Console.Write("Введите название книги: ");
+            string title = Console.ReadLine();
+
+            Console.Write("Введите автора книги: ");
+            string author = Console.ReadLine();
+
+            Console.Write("Введите год издания книги: ");
+            int year = int.Parse(Console.ReadLine());
+
+            Book book = new Book(title, author, year);
+            books.Add(book);
+
+            Console.WriteLine("Книга добавлена успешно.");
+        }
+
+        static void RemoveBook()
+        {
+            Console.Write("Введите название книги для удаления: ");
+            string title = Console.ReadLine();
+
+            Book bookToRemove = books.Find(b => b.Title == title);
+            if (bookToRemove != null)
+            {
+                books.Remove(bookToRemove);
+                Console.WriteLine("Книга удалена успешно.");
+            }
+            else
+            {
+                Console.WriteLine("Книга не найдена.");
+            }
+        }
+
+        static void EditBook()
+        {
+            Console.Write("Введите название книги для редактирования: ");
+            string title = Console.ReadLine();
+
+            Book bookToEdit = books.Find(b => b.Title == title);
+            if (bookToEdit != null)
+            {
+                Console.Write("Введите новое название книги: ");
+                bookToEdit.Title = Console.ReadLine();
+
+                Console.Write("Введите нового автора книги: ");
+                bookToEdit.Author = Console.ReadLine();
+
+                Console.Write("Введите новый год издания книги: ");
+                bookToEdit.Year = int.Parse(Console.ReadLine());
+
+                Console.WriteLine("Книга отредактирована успешно.");
+            }
+            else
+            {
+                Console.WriteLine("Книга не найдена.");
+            }
+        }
+
+        static void SearchBook()
+        {
+            Console.Write("Введите название книги для поиска: ");
+            string title = Console.ReadLine();
+
+            Book bookToSearch = books.Find(b => b.Title == title);
+            if (bookToSearch != null)
+            {
+                Console.WriteLine($"Название: {bookToSearch.Title}, Автор: {bookToSearch.Author}, Год: {bookToSearch.Year}");
+            }
+            else
+            {
+                Console.WriteLine("Книга не найдена.");
+            }
+        }
+
+        static void DisplayAllBooks()
+        {
+            if (books.Count == 0)
+            {
+                Console.WriteLine("В библиотеке нет книг.");
+            }
+            else
+            {
+                foreach (Book book in books)
+                {
+                    Console.WriteLine($"Название: {book.Title}, Автор: {book.Author}, Год: {book.Year}");
+                }
+            }
+        }
+
+        static void LoadBooksFromXml()
+        {
+            if (File.Exists(xmlFilePath))
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(List<Book>));
+                using (FileStream stream = new FileStream(xmlFilePath, FileMode.Open))
+                {
+                    books = (List<Book>)serializer.Deserialize(stream);
+                }
+            }
+        }
+
+        static void SaveBooksToXml()
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(List<Book>));
+            using (FileStream stream = new FileStream(xmlFilePath, FileMode.Create))
+            {
+                serializer.Serialize(stream, books);
+            }
+        }
+    }
+
+    [XmlRoot("Книги")]
+    public class Book
+    {
+        [XmlElement("Название")]
+        public string Title { get; set; }
+
+        [XmlElement("Автор")]
+        public string Author { get; set; }
+
+        [XmlElement("Год")]
+        public int Year { get; set; }
+
+        public Book() { }
+
+        public Book(string title, string author, int year)
+        {
+            Title = title;
+            Author = author;
+            Year = year;
+        }
+    }
+}*/
