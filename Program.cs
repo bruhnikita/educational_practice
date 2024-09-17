@@ -3634,7 +3634,7 @@ class Program
 статистику по проданным товарам (общая сумма продаж, количество проданных
 единиц каждого товара и т.д.)*/
 
-public class SalesAnalyst
+/*public class SalesAnalyst
 {   
     public List<Product> Products;
     public int CountOfSales {  get; set; }
@@ -3830,4 +3830,94 @@ public class SalesAnalyst
 
         }
     }
+}*/
+
+/*public class WeatherDataAnalyst
+{
+    public int CountOfMonths = 3;
+    public List<MonthData> monthDatas;
+
+    public WeatherDataAnalyst()
+    {
+        monthDatas = new List<MonthData>();
+        GetMonthsData();
+        PrintData();
+    }
+
+    private void GetMonthsData()
+    {
+        Console.WriteLine("Введите данные на квартал: ");
+        for (int i = 0; i < CountOfMonths; i++)
+        {
+            Console.WriteLine("Введите среднюю температуру: ");
+            int avarage = int.Parse(Console.ReadLine());
+
+            if (avarage == null)
+            {
+                Console.WriteLine("Средняя температура не может быть пустой. Попробуйте снова. ");
+                Console.Clear();
+                return;
+            }
+
+            Console.WriteLine("Введите количество осадков: ");
+            int precipitation = int.Parse(Console.ReadLine());
+
+            if (precipitation == null || precipitation < 0)
+            {
+                Console.WriteLine("Осадки не могут быть пустыми или меньше нуля. Попробуйте снова.");
+                Console.Clear();
+                return;
+            }
+
+            try
+            {
+                MonthData newMonth = new MonthData("", avarage, precipitation);
+                monthDatas.Add(newMonth);
+                Console.Clear();
+                Console.WriteLine("Месяц добавлен.");
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка добавления данных на месяц: {ex.Message}");
+                break;
+            }
+        }
+    }
+
+    private void PrintData()
+    {
+        monthDatas[0].Name = "Сентрябрь";
+        monthDatas[1].Name = "Октябрь";
+        monthDatas[2].Name = "Ноябрь";
+
+
+        Console.WriteLine("Месяц\tСредняя температура\tОсадки");
+        foreach (MonthData monthData in monthDatas)
+        {
+            Console.WriteLine($"{monthData.Name}:\t{monthData.AverageTemperature}\t{monthData.Precipitation}");
+        }
+    }
+
+
+    public class MonthData
+    {
+        public string Name { get; set; }
+        public int AverageTemperature {get; set;}
+        public int Precipitation { get; set;}
+
+        public MonthData(string name, int avarageTemperature, int precipitation)
+        {
+            Name = name;
+            AverageTemperature = avarageTemperature;
+            Precipitation = precipitation;
+        }
+    }
+
+    static void Main(string[] args)
+    {
+        WeatherDataAnalyst analyst = new WeatherDataAnalyst();
+    }
 }
+*/
+
